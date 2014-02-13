@@ -53,7 +53,10 @@
 
     int selectStatus = [selectTask terminationStatus];
 
-    if (selectStatus == -1)
+    //Older Xcode
+    //if (selectStatus == -1)
+    //Newer Xcode
+    if (selectStatus == -1 || selectStatus == 0)
         return relToolPath;
 
     NSData* selectData = [[selectPipe fileHandleForReading] availableData];
