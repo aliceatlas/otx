@@ -39,10 +39,12 @@
     NSString* relToolBase = [NSString pathWithComponents:
         [NSArray arrayWithObjects: @"/", @"usr", @"bin", nil]];
     NSString* relToolPath = [relToolBase stringByAppendingPathComponent: toolName];
-    NSString* selectToolPath = [relToolBase stringByAppendingPathComponent: @"xcode-select"];
+    //NSString* selectToolPath = [relToolBase stringByAppendingPathComponent: @"xcode-select"];
+    NSString* selectToolPath = [relToolBase stringByAppendingPathComponent: @"xcrun"];
     NSTask* selectTask = [[[NSTask alloc] init] autorelease];
     NSPipe* selectPipe = [NSPipe pipe];
-    NSArray* args = [NSArray arrayWithObject: @"--print-path"];
+    //NSArray* args = [NSArray arrayWithObject: @"--print-path"];
+    NSArray* args = [NSArray arrayWithObjects: @"--find", toolName, nil];
 
     [selectTask setLaunchPath: selectToolPath];
     [selectTask setArguments: args];
@@ -50,13 +52,13 @@
     [selectTask setStandardOutput: selectPipe];
     [selectTask launch];
     [selectTask waitUntilExit];
-
+    
     int selectStatus = [selectTask terminationStatus];
 
     //Older Xcode
-    //if (selectStatus == -1)
+    if (selectStatus == -1)
     //Newer Xcode
-    if (selectStatus == -1 || selectStatus == 0)
+    //if (selectStatus == -1 || selectStatus == 0)
         return relToolPath;
 
     NSData* selectData = [[selectPipe fileHandleForReading] availableData];
@@ -64,9 +66,11 @@
                                                       length: [selectData length]
                                                     encoding: NSUTF8StringEncoding] autorelease];
 
-    return [[absToolPath stringByTrimmingCharactersInSet:
-        [NSCharacterSet whitespaceAndNewlineCharacterSet]]
-        stringByAppendingPathComponent: relToolPath];
+//    return [[absToolPath stringByTrimmingCharactersInSet:
+//        [NSCharacterSet whitespaceAndNewlineCharacterSet]]
+//        stringByAppendingPathComponent: relToolPath];
+    return [absToolPath stringByTrimmingCharactersInSet:
+        [NSCharacterSet whitespaceAndNewlineCharacterSet]];
 }
 
 @end
