@@ -4,6 +4,6 @@ Another otx fork, maintained primarily for my own use on modern OS X versions. C
 
 Installation
 ------------
-1. Mount otx.dmg for the prebuilt binaries or build from source.
+1. Download the DMG from the releases for the prebuilt binaries or build from source.
 2. Copy otx to /usr/local/bin/
 3. Copy otx.app to /Applications/
