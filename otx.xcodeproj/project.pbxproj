@@ -577,7 +577,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
-				WARNING_CFLAGS = "-wall";
+				WARNING_CFLAGS = "-Wall";
 			};
 			name = Debug;
 		};
