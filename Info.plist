@@ -47,7 +47,7 @@ Public Domain</string>
 	<key>CFBundleSignature</key>
 	<string>ot++</string>
 	<key>CFBundleVersion</key>
-	<string>288</string>
+	<string>289</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>The otx project and all original otx source files are in the public domain.</string>
 	<key>NSMainNibFile</key>
