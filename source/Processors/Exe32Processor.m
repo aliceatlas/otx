@@ -736,13 +736,37 @@
     // remaining. Copy it, starting after the preceding tab.
     if (consumedAfterOp && consumedAfterOp < theOrigLength - 1)
     {
-        size_t  origCommentLength   = theOrigLength - consumedAfterOp - 1;
-
-        strncpy(theOrigCommentCString, (*ioLine)->chars + consumedAfterOp + 1,
-            origCommentLength);
-
-        // Add the null terminator.
-        theOrigCommentCString[origCommentLength - 1]    = 0;
+        if (iLineOperandsCString[0] == '*' &&
+            (iLineOperandsCString[1] == '+' || iLineOperandsCString[1] == '-'))
+        {   // ObjC method call with whitespace
+            char    dummyAddressCString[9] = {0};
+            char    dummyMnemonicCString[20] = {0};
+            
+            sscanf((*ioLine)->chars, "%s\t%s\t%[^\t\n]s", dummyAddressCString,
+                   dummyMnemonicCString, iLineOperandsCString);
+        }
+        else {
+            
+            size_t operandsCstringLength = strlen(iLineOperandsCString);
+            if (operandsCstringLength && iLineOperandsCString[operandsCstringLength-1]==','){
+                char    dummyAddressCString[9] = {0};
+                char    dummyMnemonicCString[20] = {0};
+                
+                
+                sscanf((*ioLine)->chars, "%s\t%s\t%[^\t\n]s", dummyAddressCString,
+                       dummyMnemonicCString, iLineOperandsCString);
+            }
+            else    // regular comment
+            {
+                size_t  origCommentLength   = theOrigLength - consumedAfterOp - 1;
+                
+                strncpy(theOrigCommentCString, (*ioLine)->chars + consumedAfterOp + 1,
+                        origCommentLength);
+                
+                // Add the null terminator.
+                theOrigCommentCString[origCommentLength - 1]    = 0;
+            }
+        }
     }
 
     char theCodeCString[32] = {0};
@@ -1245,42 +1269,24 @@
         formatMarker += snprintf(&finalFormatCString[formatMarker],
             10, "%s", "%s %s");
 
-    if (iOpts.showCode)
-        formatMarker += snprintf(&finalFormatCString[formatMarker],
-            10, "%s", "%s %s");
-
     if (iLineOperandsCString[0])
     {
         if (theCommentCString[0])
             snprintf(&finalFormatCString[formatMarker],
-                30, "%s", "%s %s%s %s%s %s%s\n");
+                30, "%s", "%s %s%s %s%s %s%s %s%s\n");
         else
             snprintf(&finalFormatCString[formatMarker],
-                30, "%s", "%s %s%s %s%s\n");
+                30, "%s", "%s %s%s %s%s %s%s\n");
     }
     else
         snprintf(&finalFormatCString[formatMarker],
-            30, "%s", "%s %s%s\n");
+            30, "%s", "%s %s%s %s%s\n");
 
     char    theFinalCString[MAX_LINE_LENGTH] = "";
 
-    if (iOpts.localOffsets && iOpts.showCode)
+    if (iOpts.localOffsets)
         snprintf(theFinalCString, MAX_LINE_LENGTH,
             finalFormatCString, localOffsetString,
-            addrSpaces, theAddressCString,
-            instSpaces, theCodeCString,
-            mnemSpaces, theMnemonicCString,
-            opSpaces, iLineOperandsCString,
-            commentSpaces, theCommentCString);
-    else if (iOpts.localOffsets)
-        snprintf(theFinalCString, MAX_LINE_LENGTH,
-            finalFormatCString, localOffsetString,
-            addrSpaces, theAddressCString,
-            instSpaces, theMnemonicCString,
-            opSpaces, iLineOperandsCString,
-            commentSpaces, theCommentCString);
-    else if (iOpts.showCode)
-        snprintf(theFinalCString, MAX_LINE_LENGTH,
             addrSpaces, theAddressCString,
             instSpaces, theCodeCString,
             mnemSpaces, theMnemonicCString,
@@ -1289,7 +1295,8 @@
     else
         snprintf(theFinalCString, MAX_LINE_LENGTH,
             finalFormatCString, theAddressCString,
-            instSpaces, theMnemonicCString,
+            instSpaces, theCodeCString,
+            mnemSpaces, theMnemonicCString,
             opSpaces, iLineOperandsCString,
             commentSpaces, theCommentCString);
 
