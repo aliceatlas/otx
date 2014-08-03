@@ -31,7 +31,6 @@
 		25A62EFE0C38A7C500B08D38 /* Prefs General Icon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 25A62EFB0C38A7C500B08D38 /* Prefs General Icon.tif */; };
 		25A62EFF0C38A7C500B08D38 /* Main Window Background.tif in Resources */ = {isa = PBXBuildFile; fileRef = 25A62EFC0C38A7C500B08D38 /* Main Window Background.tif */; };
 		25A62F060C38A86C00B08D38 /* App Icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 25A62F050C38A86C00B08D38 /* App Icon.icns */; };
-		32ABCA8B16FD65B4002102C8 /* ObjcTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 55E1267C14DE46F3003B4A16 /* ObjcTypes.m */; };
 		55E1267E14DE58BB003B4A16 /* ObjcTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 55E1267C14DE46F3003B4A16 /* ObjcTypes.m */; };
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -460,7 +459,6 @@
 				257833770D4C62FD00E05A06 /* Arch64Specifics.m in Sources */,
 				25924A8A0D4D670C0050AA16 /* Exe32Processor.m in Sources */,
 				25924BFB0D4D88C90050AA16 /* Searchers64.m in Sources */,
-				32ABCA8B16FD65B4002102C8 /* ObjcTypes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
