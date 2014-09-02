@@ -59,8 +59,6 @@
         free(iLocalVars);
         iLocalVars  = NULL;
     }
-
-    [super dealloc];
 }
 
 //  loadDyldDataSection:

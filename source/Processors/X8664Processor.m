@@ -61,8 +61,6 @@
         free(iLocalVars);
         iLocalVars  = NULL;
     }
-
-    [super dealloc];
 }
 
 //  loadDyldDataSection:
@@ -2768,8 +2766,6 @@
         [[[inOutputFilePath stringByDeletingLastPathComponent]
         stringByAppendingPathComponent: [[iOFile path] lastPathComponent]]
         stringByAppendingString: @"_fixed"]];
-
-    [newURL autorelease];
 
     if (![newFile writeToURL: newURL options: NSAtomicWrite error: &error])
     {

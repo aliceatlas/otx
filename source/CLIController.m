@@ -56,7 +56,6 @@
         iArchSelector != CPU_TYPE_I386)
     {   // We're running on a machine that doesn't exist.
         fprintf(stderr, "otx: I shouldn't be here...\n");
-        [self release];
         return nil;
     }
 
@@ -85,7 +84,6 @@
             if (argv[i][1] == '\0') // just '-'
             {
                 [self usage];
-                [self release];
                 return nil;
             }
 
@@ -107,7 +105,6 @@
                     fprintf(stderr, "otx: unknown architecture: \"%s\"\n",
                         argv[i]);
                     [self usage];
-                    [self release];
                     return nil;
                 }
             }
@@ -162,7 +159,6 @@
                             fprintf(stderr, "otx: unknown argument: '%c'\n",
                                 argv[i][j]);
                             [self usage];
-                            [self release];
                             return nil;
                     }   // switch (argv[i][j])
                 }   // for (j = 1; argv[i][j] != '\0'; j++)
@@ -178,7 +174,6 @@
     if (!origFilePath)
     {
         fprintf(stderr, "You must specify an executable file to process.\n");
-        [self release];
         return nil;
     }
 
@@ -188,7 +183,6 @@
     if (![fileMan fileExistsAtPath: origFilePath])
     {
         fprintf(stderr, "otx: No file found at %s.\n", UTF8STRING(origFilePath));
-        [self release];
         return nil;
     }
 
@@ -202,7 +196,6 @@
     if (!iOFile)
     {
         fprintf(stderr, "otx: Invalid file.\n");
-        [self release];
         return nil;
     }
 
@@ -214,7 +207,6 @@
     {
         fprintf(stderr, "otx: Unable to open %s.\n",
             UTF8STRING([origFilePath lastPathComponent]));
-        [self release];
         return nil;
     }
 
@@ -229,14 +221,12 @@
         fprintf(stderr, "otx: Unable to read from %s. %s\n",
             UTF8STRING([origFilePath lastPathComponent]),
             UTF8STRING([e reason]));
-        [self release];
         return nil;
     }
 
     if ([fileData length] < sizeof(iFileArchMagic))
     {
         fprintf(stderr, "otx: Truncated executable file.\n");
-        [self release];
         return nil;
     }
 
@@ -282,7 +272,6 @@
         default:
             fprintf(stderr, "otx: %s is not a Mach-O file.\n",
                 UTF8STRING([origFilePath lastPathComponent]));
-            [self release];
             return nil;
     }
 
@@ -311,20 +300,6 @@
         "\t               if not specified, the host architecture is used\n"
         "\t               allowed values: ppc, ppc64, i386, x86_64\n"
     );
-}
-
-//  dealloc
-// ----------------------------------------------------------------------------
-
-- (void)dealloc
-{
-    if (iOFile)
-        [iOFile release];
-
-    if (iExeName)
-        [iExeName release];
-
-    [super dealloc];
 }
 
 #pragma mark -
@@ -364,17 +339,8 @@
 - (void)newOFile: (NSURL*)inOFile
        needsPath: (BOOL)inNeedsPath
 {
-    if (iOFile)
-        [iOFile release];
-
-    if (iExeName)
-        [iExeName release];
-
     iOFile  = inOFile;
-    [iOFile retain];
-
     iExeName    = [[inOFile path] lastPathComponent];
-    [iExeName retain];
 }
 
 #pragma mark -
@@ -448,13 +414,10 @@
            PRDescriptionKey: @"Loading executable"} mutableCopy];
 
     [self reportProgress: progDict];
-    [progDict release];
-
     if (![theProcessor processExe: nil])
     {
         fprintf(stderr, "otx: -[CLIController processFile]: "
             "possible permission error\n");
-        [theProcessor release];
         return;
     }
     
@@ -462,8 +425,6 @@
     {
         [theProcessor printSummary];
     }
-
-    [theProcessor release];
 }
 
 //  verifyNops
@@ -531,8 +492,6 @@
             }
             else
                 printf("The executable is healthy.\n");
-
-            [theProcessor release];
 
             break;
         }

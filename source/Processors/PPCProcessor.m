@@ -60,8 +60,6 @@ extern BOOL gCancel;
         free(iLocalVars);
         iLocalVars  = NULL;
     }
-
-    [super dealloc];
 }
 
 //  loadDyldDataSection:

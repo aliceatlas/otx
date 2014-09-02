@@ -54,7 +54,6 @@
     {
         fprintf(stderr, "otx: error loading executable from disk: %s\n",
             UTF8STRING([theError localizedFailureReason]));
-        [self release];
         return nil;
     }
 
@@ -63,7 +62,6 @@
     if (iRAMFileSize < sizeof(iFileArchMagic))
     {
         fprintf(stderr, "otx: truncated executable file\n");
-        [self release];
         return nil;
     }
 
@@ -72,7 +70,6 @@
     if (!iRAMFile)
     {
         fprintf(stderr, "otx: not enough memory to allocate mRAMFile\n");
-        [self release];
         return nil;
     }
 
@@ -119,23 +116,18 @@
 
     if (iCPFiltInputPipe)
     {
-        [iCPFiltInputPipe release];
         iCPFiltInputPipe = nil;
     }
 
     if (iCPFiltOutputPipe)
     {
-        [iCPFiltOutputPipe release];
         iCPFiltOutputPipe = nil;
     }
 
     if (iCPFiltTask)
     {
         [iCPFiltTask terminate];
-        [iCPFiltTask release];
     }
-
-    [super dealloc];
 }
 
 #pragma mark -
@@ -376,7 +368,7 @@
 - (NSString*)generateMD5String
 {
     NSString* md5Path = [NSString pathWithComponents: @[@"/", @"sbin", @"md5"]];
-    NSTask* md5Task = [[[NSTask alloc] init] autorelease];
+    NSTask* md5Task = [[NSTask alloc] init];
     NSPipe* md5Pipe = [NSPipe pipe];
     NSPipe* errorPipe = [NSPipe pipe];
     NSArray* args = @[@"-q", [iOFile path]];
@@ -421,14 +413,14 @@
             return nil;
         }
 
-        NSString* errorString = [[[NSString alloc] initWithBytes: [errorData bytes]
-                                                          length: [errorData length]
-                                                        encoding: NSUTF8StringEncoding] autorelease];
+        NSString* errorString = [[NSString alloc] initWithBytes: errorData.bytes
+                                                         length: errorData.length
+                                                       encoding: NSUTF8StringEncoding];
 
-        if (errorString == nil || [errorString length] == 0)
+        if (errorString == nil || errorString.length == 0)
             errorString = @"unknown error";
 
-        NSLog(@"otx: unable to generate md5 checksum for \"%@\": %@", [iOFile path], errorString);
+        NSLog(@"otx: unable to generate md5 checksum for \"%@\": %@", iOFile.path, errorString);
         return nil;
     }
 
@@ -440,19 +432,19 @@
     }
     @catch (NSException* e)
     {
-        NSLog(@"otx: unable to read from md5 data for \"%@\": %@", [iOFile path], [e reason]);
+        NSLog(@"otx: unable to read from md5 data for \"%@\": %@", iOFile.path, e.reason);
         return nil;
     }
 
     if (md5Data == nil || [md5Data length] == 0) // md5Task produced no data, log and bail
     {
-        NSLog(@"otx: unexpected failure while generating md5 checksum of \"%@\"", [iOFile path]);
+        NSLog(@"otx: unexpected failure while generating md5 checksum of \"%@\"", iOFile.path);
         return nil;
     }
 
-    NSString* stringFromData = [[[NSString alloc] initWithBytes: [md5Data bytes]
-                                                         length: [md5Data length]
-                                                       encoding: NSUTF8StringEncoding] autorelease];
+    NSString* stringFromData = [[NSString alloc] initWithBytes: md5Data.bytes
+                                                        length: md5Data.length
+                                                      encoding: NSUTF8StringEncoding];
 
     return [NSString stringWithFormat: @"\nmd5: %@\n", [stringFromData stringByTrimmingCharactersInSet:
         [NSCharacterSet whitespaceAndNewlineCharacterSet]]];

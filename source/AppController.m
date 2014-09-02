@@ -71,34 +71,6 @@
 //  dealloc
 // ----------------------------------------------------------------------------
 
-- (void)dealloc
-{
-    if (iObjectFile)
-        [iObjectFile release];
-
-    if (iExeName)
-        [iExeName release];
-
-    if (iOutputFileLabel)
-        [iOutputFileLabel release];
-
-    if (iOutputFileName)
-        [iOutputFileName release];
-
-    if (iOutputFilePath)
-        [iOutputFilePath release];
-
-    if (iTextShadow)
-        [iTextShadow release];
-
-    if (iPrefsViews)
-        free(iPrefsViews);
-
-    if (iIndeterminateProgBarMainThreadTimer)
-        [iIndeterminateProgBarMainThreadTimer release];
-
-    [super dealloc];
-}
 
 #pragma mark -
 //  openExe:
@@ -127,11 +99,8 @@
 
 - (void)newPackageFile: (NSURL*)inPackageFile
 {
-    if (iOutputFilePath)
-        [iOutputFilePath release];
 
     iOutputFilePath = [inPackageFile path];
-    [iOutputFilePath retain];
 
     NSBundle*   exeBundle   = [NSBundle bundleWithPath: iOutputFilePath];
 
@@ -161,22 +130,14 @@
 - (void)newOFile: (NSURL*)inOFile
        needsPath: (BOOL)inNeedsPath
 {
-    if (iObjectFile)
-        [iObjectFile release];
 
-    if (iExeName)
-        [iExeName release];
 
     iObjectFile  = inOFile;
-    [iObjectFile retain];
 
     if (inNeedsPath)
     {
-        if (iOutputFilePath)
-            [iOutputFilePath release];
 
         iOutputFilePath = iObjectFile.path;
-        [iOutputFilePath retain];
     }
 
     if ([[NSWorkspace sharedWorkspace] isFilePackageAtPath: iOutputFilePath])
@@ -185,7 +146,6 @@
     else
         iExeName    = iOutputFilePath.lastPathComponent;
 
-    [iExeName retain];
 
     [self refreshMainWindow];
     [self syncOutputText: nil];
@@ -298,7 +258,6 @@
         [newString addAttribute: NSShadowAttributeName value: iTextShadow
             range: NSMakeRange(0, [newString length])];
         inText.attributedStringValue = newString;
-        [newString release];
     }
 }
 
@@ -314,12 +273,6 @@
     iSelectedArchCPUSubType     = selectedCPU->subtype;
     const NXArchInfo* archInfo  = NXGetArchInfoFromCpuType(
         iSelectedArchCPUType, iSelectedArchCPUSubType);
-
-    if (iOutputFileLabel)
-    {
-        [iOutputFileLabel release];
-        iOutputFileLabel    = nil;
-    }
 
     iOutputFileLabel = [NSString stringWithFormat: @"_%s", archInfo->name];
 
@@ -341,9 +294,6 @@
         default:
             break;
     }
-
-    if (iOutputFileLabel)
-        [iOutputFileLabel retain];
 
     [self syncOutputText: nil];
     [self syncSaveButton];
@@ -377,15 +327,10 @@
         return;
     }
 
-    if (iOutputFileName)
-        [iOutputFileName release];
 
     iOutputFileName = iOutputText.stringValue;
-    [iOutputFileName retain];
 
     NSString*   theTempOutputFilePath   = iOutputFilePath;
-
-    [theTempOutputFilePath retain];
 
     if ([[NSUserDefaults standardUserDefaults] boolForKey: AskOutputDirKey])
     {
@@ -397,9 +342,6 @@
         if ([thePanel runModal]  != NSFileHandlingPanelOKButton)
             return;
 
-        if (iOutputFilePath)
-            [iOutputFilePath release];
-
         iOutputFilePath = thePanel.URL.path;
     }
     else
@@ -409,9 +351,6 @@
             stringByAppendingPathComponent: iOutputText.stringValue];
     }
 
-    [iOutputFilePath retain];
-    [theTempOutputFilePath release];
-    
     [self processFile];
 }
 
@@ -420,12 +359,8 @@
 
 - (void)processFile
 {
-    NSDictionary*   progDict    =
-        @{PRIndeterminateKey: @YES,
-          PRDescriptionKey:   @"Loading executable"};
-
-    [self reportProgress: progDict];
-    [progDict release];
+    [self reportProgress: @{PRIndeterminateKey: @YES,
+                            PRDescriptionKey:   @"Loading executable"}];
 
     if ([self checkOtool: iObjectFile.path] == NO)
     {
@@ -523,14 +458,12 @@
             [self performSelectorOnMainThread: @selector(processingThreadDidFinish:)
                                    withObject: resultString
                                 waitUntilDone: NO];
-            [theProcessor release];
             return;
         }
 
         [self performSelectorOnMainThread: @selector(processingThreadDidFinish:)
                                withObject: PROCESS_SUCCESS
                             waitUntilDone: NO];
-        [theProcessor release];
     }
 }
 
@@ -663,7 +596,7 @@
 
     // Do the deed.
     [theAnim startAnimation];
-    [theAnim autorelease];
+    //[theAnim autorelease];
 }
 
 //  hideProgView:
@@ -739,7 +672,7 @@
 
         // Do the deed.
         [theAnim startAnimation];
-        [theAnim autorelease];
+        //[theAnim autorelease];
     }
     else
     {
@@ -878,9 +811,6 @@
                     modalDelegate: nil didEndSelector: nil contextInfo: nil];
             }
 
-            [theAlert release];
-            [theProcessor release];
-
             break;
         }
 
@@ -932,9 +862,6 @@
             }
 
             NSURL* fixedFile = [theProcessor fixNops: theNops toPath: iOutputFilePath];
-
-            [theProcessor release];
-
             if (fixedFile)
             {
                 iIgnoreArch = YES;
@@ -1129,11 +1056,7 @@
         return;
     }
 
-    if (iOutputFileLabel)
-    {
-        [iOutputFileLabel release];
-        iOutputFileLabel    = nil;
-    }
+    iOutputFileLabel    = nil;
 
     NSString*   tempString;
     NSString*   menuItemTitleToSelect   = NULL;
@@ -1259,9 +1182,6 @@
     iTypeText.stringValue = tempString;
     [self applyShadowToText: iTypeText];
 
-    if (iOutputFileLabel)
-        [iOutputFileLabel retain];
-
     if (menuItemTitleToSelect != NULL)
         [iArchPopup selectItemWithTitle: menuItemTitleToSelect];
 
@@ -1321,8 +1241,8 @@
 - (void)setupPrefsWindow
 {
     // Setup toolbar.
-    NSToolbar*  toolbar = [[[NSToolbar alloc]
-        initWithIdentifier: OTXPrefsToolbarID] autorelease];
+    NSToolbar*  toolbar = [[NSToolbar alloc]
+        initWithIdentifier: OTXPrefsToolbarID];
 
     toolbar.displayMode = NSToolbarDisplayModeIconAndLabel;
     toolbar.delegate = self;
@@ -1334,7 +1254,7 @@
     NSUInteger  numViews    = toolbar.items.count;
     NSUInteger  i;
 
-    iPrefsViews     = calloc(numViews, sizeof(NSView*));
+    iPrefsViews     = [[NSMutableArray alloc] initWithCapacity:numViews];
     iPrefsViews[0]  = iPrefsGeneralView;
     iPrefsViews[1]  = iPrefsOutputView;
 
@@ -1346,7 +1266,7 @@
     // first asking the object something, I always think there's an instance
     // method missing.
     [iPrefsWindow setFrame: [iPrefsWindow frameRectForContentRect:
-        iPrefsViews[iPrefsCurrentViewIndex].frame] display: NO];
+                             ((NSView *)iPrefsViews[iPrefsCurrentViewIndex]).frame] display: NO];
 
     for (i = 0; i < numViews; i++)
         [[iPrefsWindow contentView] addSubview: iPrefsViews[i]];
@@ -1413,7 +1333,7 @@
 
     // Do the deed.
     [windowAnim startAnimation];
-    [windowAnim autorelease];
+    //[windowAnim autorelease];
 }
 
 #pragma mark -
@@ -1456,7 +1376,6 @@
     theAlert.informativeText = inInformativeText;
     [theAlert beginSheetModalForWindow: iMainWindow
         modalDelegate: nil didEndSelector: nil contextInfo: nil];
-    [theAlert release];
 }
 
 #pragma mark -
@@ -1691,7 +1610,7 @@
 
                 // Do the deed.
                 [viewFadeOutAnim startAnimation];
-                [viewFadeOutAnim autorelease];
+                //[viewFadeOutAnim autorelease];
             }
         }
     }
@@ -1926,8 +1845,8 @@
     itemForItemIdentifier: (NSString*)itemIdent
 willBeInsertedIntoToolbar: (BOOL)willBeInserted
 {
-    NSToolbarItem*  item = [[[NSToolbarItem alloc]
-        initWithItemIdentifier: itemIdent] autorelease];
+    NSToolbarItem*  item = [[NSToolbarItem alloc]
+        initWithItemIdentifier: itemIdent];
 
     if ([itemIdent isEqual: PrefsGeneralToolbarItemID])
     {

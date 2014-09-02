@@ -112,7 +112,7 @@ CPUID;
     NSString*               iOutputFileLabel;
     NSString*               iOutputFileName;
     NSString*               iOutputFilePath;
-    NSView**                iPrefsViews;
+    NSMutableArray*         iPrefsViews;
     NSUInteger              iPrefsCurrentViewIndex;
     host_basic_info_data_t  iHostInfo;
     NSShadow*               iTextShadow;

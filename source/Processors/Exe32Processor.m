@@ -92,8 +92,6 @@
     [self deleteFuncInfos];
     [self deleteLinesFromList: iPlainLineListHead];
     [self deleteLinesFromList: iVerboseLineListHead];
-
-    [super dealloc];
 }
 
 //  deleteFuncInfos
@@ -175,8 +173,6 @@
         withObject: progDict waitUntilDone: NO];
 #endif
 
-    [progDict release];
-
     [self populateLineLists];
 
     if (gCancel == YES)
@@ -191,8 +187,6 @@
     [iController performSelectorOnMainThread: @selector(reportProgress:)
         withObject: progDict waitUntilDone: NO];
 #endif
-
-    [progDict release];
 
     // Gather info about lines while they're virgin.
     [self gatherLineInfos];
@@ -233,8 +227,6 @@
         withObject: progDict waitUntilDone: NO];
 #endif
 
-    [progDict release];
-
     Line*   theLine = iPlainLineListHead;
 
     // Loop thru lines.
@@ -254,8 +246,6 @@
             [iController performSelectorOnMainThread: @selector(reportProgress:)
                 withObject: progDict waitUntilDone: NO];
 #endif
-
-            [progDict release];
         }
 
         if (theLine->info.isCode)
@@ -286,8 +276,6 @@
         withObject: progDict waitUntilDone: NO];
 #endif
 
-    [progDict release];
-
     // Create output file.
     if (![self printLinesFromList: iPlainLineListHead])
     {
@@ -310,8 +298,6 @@
     [iController performSelectorOnMainThread: @selector(reportProgress:)
         withObject: progDict waitUntilDone: NO];
 #endif
-
-    [progDict release];
 
     return YES;
 }

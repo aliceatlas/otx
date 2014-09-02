@@ -18,7 +18,7 @@
 - (BOOL)checkOtool: (NSString*)filePath
 {
     NSString* otoolPath = [self pathForTool: @"otool"];
-    NSTask* otoolTask = [[[NSTask alloc] init] autorelease];
+    NSTask* otoolTask = [[NSTask alloc] init];
     NSPipe* silence = [NSPipe pipe];
 
     otoolTask.launchPath = otoolPath;
@@ -40,7 +40,7 @@
     NSString* relToolPath = [relToolBase stringByAppendingPathComponent: toolName];
 
     NSString* xcrunToolPath = [relToolBase stringByAppendingPathComponent: @"xcrun"];
-    NSTask* xcrunTask = [[[NSTask alloc] init] autorelease];
+    NSTask* xcrunTask = [[NSTask alloc] init];
     NSPipe* xcrunPipe = [NSPipe pipe];
     NSArray* args = @[@"--find", toolName];
 
@@ -56,10 +56,10 @@
     if (xcrunStatus == -1)
         return relToolPath;
 
-    NSData* xcrunData = [[xcrunPipe fileHandleForReading] availableData];
-    NSString* absToolPath = [[[NSString alloc] initWithBytes: [xcrunData bytes]
-                                                      length: [xcrunData length]
-                                                    encoding: NSUTF8StringEncoding] autorelease];
+    NSData* xcrunData = xcrunPipe.fileHandleForReading.availableData;
+    NSString* absToolPath = [[NSString alloc] initWithBytes: xcrunData.bytes
+                                                      length: xcrunData.length
+                                                    encoding: NSUTF8StringEncoding];
 
     return [absToolPath stringByTrimmingCharactersInSet:
         [NSCharacterSet whitespaceAndNewlineCharacterSet]];
