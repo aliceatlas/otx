@@ -194,16 +194,16 @@ enum {
     char        iLineCommentCString[MAX_COMMENT_LENGTH];
     char        iLineOperandsCString[MAX_OPERANDS_LENGTH];
 }
+@property (readonly) NSString *MD5String;
 
-- (id)initWithURL: (NSURL*)inURL
-       controller: (id)inController
-          options: (ProcOptions*)inOptions;
+- (instancetype)initWithURL: (NSURL*)inURL
+                 controller: (id)inController
+                    options: (ProcOptions*)inOptions NS_DESIGNATED_INITIALIZER;
 - (BOOL)printDataSections;
 - (void)printDataSection: (section_info*)inSect
                   toFile: (FILE*)outFile;
 - (UInt8)sendTypeFromMsgSend: (char*)inString;
 
-- (NSString*)generateMD5String;
 - (void)decodeMethodReturnType: (const char*)inTypeCode
                         output: (char*)outCString;
 

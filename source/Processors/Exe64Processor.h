@@ -219,9 +219,9 @@ Function64Info;
     UInt64              iEndOfText;
 }
 
-- (id)initWithURL: (NSURL*)inURL
-       controller: (id)inController
-          options: (ProcOptions*)inOptions;
+- (instancetype)initWithURL: (NSURL*)inURL
+                 controller: (id)inController
+                    options: (ProcOptions*)inOptions NS_DESIGNATED_INITIALIZER;
 - (void)deleteFuncInfos;
 
 // processors
@@ -246,10 +246,10 @@ Function64Info;
 - (void)chooseLine: (Line64**)ioLine;
 - (void)entabLine: (Line64*)ioLine;
 - (char*)getPointer: (UInt64)inAddr
-               type: (UInt8*)outType;
+               type: (UInt8*)outType NS_RETURNS_INNER_POINTER;
 
 - (char*)selectorForMsgSend: (char*)outComment
-                   fromLine: (Line64*)inLine;
+                   fromLine: (Line64*)inLine NS_RETURNS_INNER_POINTER;
 
 - (void)insertMD5;
 

@@ -19,12 +19,12 @@
 //  initWithViewAnimations:
 // ----------------------------------------------------------------------------
 
-- (id)initWithViewAnimations: (NSArray*)viewAnimations
+- (instancetype)initWithViewAnimations: (NSArray*)viewAnimations
 {
     if ((self = [super initWithViewAnimations: viewAnimations]))
     {
         // Find the first window object in the array.
-        Class   windowClass = [NSWindow class];
+        Class   windowClass = NSWindow.class;
 
         for (id animObject in viewAnimations)
         {

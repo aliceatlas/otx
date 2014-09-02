@@ -177,7 +177,7 @@
         return nil;
     }
 
-    NSFileManager*  fileMan = [NSFileManager defaultManager];
+    NSFileManager*  fileMan = NSFileManager.defaultManager;
 
     // Check that the file exists.
     if (![fileMan fileExistsAtPath: origFilePath])
@@ -187,7 +187,7 @@
     }
 
     // Check that the file is an executable.
-    if ([[NSWorkspace sharedWorkspace] isFilePackageAtPath: origFilePath])
+    if ([NSWorkspace.sharedWorkspace isFilePackageAtPath: origFilePath])
         [self newPackageFile: [NSURL fileURLWithPath: origFilePath]];
     else
         [self newOFile: [NSURL fileURLWithPath: origFilePath] needsPath: YES];
@@ -201,12 +201,12 @@
 
     // Check that the executable is a Mach-O file.
     NSFileHandle*   theFileH    =
-        [NSFileHandle fileHandleForReadingAtPath: [iOFile path]];
+        [NSFileHandle fileHandleForReadingAtPath: iOFile.path];
 
     if (!theFileH)
     {
         fprintf(stderr, "otx: Unable to open %s.\n",
-            UTF8STRING([origFilePath lastPathComponent]));
+            UTF8STRING(origFilePath.lastPathComponent));
         return nil;
     }
 
@@ -219,19 +219,19 @@
     @catch (NSException* e)
     {
         fprintf(stderr, "otx: Unable to read from %s. %s\n",
-            UTF8STRING([origFilePath lastPathComponent]),
-            UTF8STRING([e reason]));
+            UTF8STRING(origFilePath.lastPathComponent),
+            UTF8STRING(e.reason));
         return nil;
     }
 
-    if ([fileData length] < sizeof(iFileArchMagic))
+    if (fileData.length < sizeof(iFileArchMagic))
     {
         fprintf(stderr, "otx: Truncated executable file.\n");
         return nil;
     }
 
     // Override the -arch flag if necessary.
-    switch (*(uint32_t*)[fileData bytes])
+    switch (*(uint32_t*)fileData.bytes)
     {
         case MH_MAGIC:
 #if TARGET_RT_LITTLE_ENDIAN
@@ -271,7 +271,7 @@
 
         default:
             fprintf(stderr, "otx: %s is not a Mach-O file.\n",
-                UTF8STRING([origFilePath lastPathComponent]));
+                UTF8STRING(origFilePath.lastPathComponent));
             return nil;
     }
 
@@ -310,7 +310,7 @@
 
 - (void)newPackageFile: (NSURL*)inPackageFile
 {
-    NSString*   origPath    = [inPackageFile path];
+    NSString*   origPath    = inPackageFile.path;
     NSBundle*   exeBundle   = [NSBundle bundleWithPath: origPath];
 
     if (!exeBundle)
@@ -320,7 +320,7 @@
         return;
     }
 
-    NSString*   exePath = [exeBundle executablePath];
+    NSString*   exePath = exeBundle.executablePath;
 
     if (!exePath)
     {
@@ -340,7 +340,7 @@
        needsPath: (BOOL)inNeedsPath
 {
     iOFile  = inOFile;
-    iExeName    = [[inOFile path] lastPathComponent];
+    iExeName    = inOFile.path.lastPathComponent;
 }
 
 #pragma mark -
@@ -362,7 +362,7 @@
         return;
     }
 
-    if ([self checkOtool: [iOFile path]] == NO)
+    if ([self checkOtool: iOFile.path] == NO)
     {
         fprintf(stderr,
             "otx: otool was not found. Please install otool and try again.\n");
@@ -374,19 +374,19 @@
     switch (iArchSelector)
     {
         case CPU_TYPE_POWERPC:
-            procClass   = [PPCProcessor class];
+            procClass   = PPCProcessor.class;
             break;
 
         case CPU_TYPE_I386:
-            procClass   = [X86Processor class];
+            procClass   = X86Processor.class;
             break;
 
         case CPU_TYPE_POWERPC64:
-            procClass   = [PPC64Processor class];
+            procClass   = PPC64Processor.class;
             break;
 
         case CPU_TYPE_X86_64:
-            procClass   = [X8664Processor class];
+            procClass   = X8664Processor.class;
             break;
 
         default:
@@ -437,9 +437,9 @@
     Class procClass = nil;
 
     if (iArchSelector == CPU_TYPE_I386)
-        procClass = [X86Processor class];
+        procClass = X86Processor.class;
     else if (iArchSelector == CPU_TYPE_X86_64)
-        procClass = [X8664Processor class];
+        procClass = X8664Processor.class;
 
     switch (iArchSelector)
     {
@@ -480,8 +480,7 @@
                     theNops->count  = foundCount;
 
                     NSURL*  fixedFile   = [theProcessor fixNops: theNops
-                        toPath: [[iOFile path]
-                        stringByAppendingString: @"_fixed"]];
+                        toPath: [iOFile.path stringByAppendingString: @"_fixed"]];
 
                     free(theNops->list);
                     free(theNops);
@@ -535,7 +534,7 @@
     NSNumber*   value       = inDict[PRValueKey];
     NSNumber*   complete    = inDict[PRCompleteKey];
 
-    if (newLine && [newLine boolValue])
+    if (newLine && newLine.boolValue)
         fprintf(stderr, "\n");
 
     if (description)
@@ -544,7 +543,7 @@
     if (value)
         fprintf(stderr, ".");
 
-    if (complete && [complete boolValue])
+    if (complete && complete.boolValue)
         fprintf(stderr, "\n");
 }
 

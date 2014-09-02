@@ -46,8 +46,7 @@ static const float gLeopardTexturedAlphas[4][kTexturedBorderWidth] =
     BOOL        iShowHilite;
     BOOL        iFillRect;
 }
-
-- (void)setFillsRect: (BOOL)inFill;
+@property BOOL fillsRect;
 
 @end
 

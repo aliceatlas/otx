@@ -23,9 +23,9 @@
 //  initWithURL:controller:options:
 // ----------------------------------------------------------------------------
 
-- (id)initWithURL: (NSURL*)inURL
-       controller: (id)inController
-          options: (ProcOptions*)inOptions
+- (instancetype)initWithURL: (NSURL*)inURL
+                 controller: (id)inController
+                    options: (ProcOptions*)inOptions
 {
     if ((self = [super initWithURL: inURL
         controller: inController options: inOptions]))

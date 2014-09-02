@@ -31,9 +31,9 @@
 //  initWithURL:controller:options:
 // ----------------------------------------------------------------------------
 
-- (id)initWithURL: (NSURL*)inURL
-       controller: (id)inController
-          options: (ProcOptions*)inOptions
+- (instancetype)initWithURL: (NSURL*)inURL
+                 controller: (id)inController
+                    options: (ProcOptions*)inOptions
 {
     if ((self = [super initWithURL: inURL
         controller: inController options: inOptions]))
@@ -2663,8 +2663,8 @@
 
     NSError*    error   = nil;
     NSURL*      newURL  = [[NSURL alloc] initFileURLWithPath:
-        [[[inOutputFilePath stringByDeletingLastPathComponent]
-        stringByAppendingPathComponent: [[iOFile path] lastPathComponent]]
+        [[inOutputFilePath.stringByDeletingLastPathComponent
+        stringByAppendingPathComponent: iOFile.path.lastPathComponent]
         stringByAppendingString: @"_fixed"]];
 
     if (![newFile writeToURL: newURL options: NSAtomicWrite error: &error])
@@ -2681,8 +2681,8 @@
     }
 
     // Copy original app's permissions to new file.
-    NSFileManager*  fileMan     = [NSFileManager defaultManager];
-    NSDictionary*   fileAttrs   = [fileMan attributesOfItemAtPath:[iOFile path] error:nil];
+    NSFileManager*  fileMan     = NSFileManager.defaultManager;
+    NSDictionary*   fileAttrs   = [fileMan attributesOfItemAtPath:iOFile.path error:nil];
 
     if (!fileAttrs)
     {
@@ -2693,7 +2693,7 @@
 
     NSDictionary*   permsDict   = @{NSFilePosixPermissions: @([fileAttrs filePosixPermissions])};
 
-    if (![fileMan setAttributes:permsDict ofItemAtPath:[newURL path] error:nil])
+    if (![fileMan setAttributes:permsDict ofItemAtPath:newURL.path error:nil])
     {
         fprintf(stderr, "otx: -[X86Processor fixNops]: "
             "unable to change file permissions for fixed executable.\n");

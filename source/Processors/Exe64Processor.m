@@ -30,9 +30,9 @@
 //  initWithURL:controller:options:
 // ----------------------------------------------------------------------------
 
-- (id)initWithURL: (NSURL*)inURL
-       controller: (id)inController
-          options: (ProcOptions*)inOptions
+- (instancetype)initWithURL: (NSURL*)inURL
+                 controller: (id)inController
+                    options: (ProcOptions*)inOptions
 {
     if (!inURL || !inController || !inOptions)
         return nil;
@@ -141,8 +141,8 @@
 
     [self loadLCommands];
 
-    NSMutableDictionary*    progDict    = [@{PRNewLineKey: @YES,
-                                            PRDescriptionKey: @"Calling otool"} mutableCopy];
+    NSDictionary*    progDict    = @{PRNewLineKey: @YES,
+                                     PRDescriptionKey: @"Calling otool"};
 
 #ifdef OTX_CLI
     [iController reportProgress: progDict];
@@ -156,8 +156,8 @@
     if (gCancel == YES)
         return NO;
 
-    progDict    = [@{PRNewLineKey: @YES,
-                     PRDescriptionKey: @"Gathering info"} mutableCopy];
+    progDict    = @{PRNewLineKey: @YES,
+                    PRDescriptionKey: @"Gathering info"};
 
 #ifdef OTX_CLI
     [iController reportProgress: progDict];
@@ -193,10 +193,10 @@
     uint32_t  progCounter = 0;
     double  progValue   = 0.0;
 
-    progDict    = [@{PRIndeterminateKey: @NO,
-                     PRValueKey: @(progValue),
-                     PRNewLineKey: @YES,
-                     PRDescriptionKey: @"Generating file"} mutableCopy];
+    progDict    = @{PRIndeterminateKey: @NO,
+                    PRValueKey: @(progValue),
+                    PRNewLineKey: @YES,
+                    PRDescriptionKey: @"Generating file"};
 
 #ifdef OTX_CLI
     [iController reportProgress: progDict];
@@ -216,7 +216,7 @@
                 return NO;
 
             progValue   = (double)progCounter / iNumLines * 100;
-            progDict    = [@{PRValueKey: @(progValue)} mutableCopy];
+            progDict    = @{PRValueKey: @(progValue)};
 
 #ifdef OTX_CLI
             [iController reportProgress: progDict];
@@ -243,9 +243,9 @@
     if (gCancel == YES)
         return NO;
 
-    progDict    = [@{PRIndeterminateKey: @YES,
-                     PRNewLineKey: @YES,
-                     PRDescriptionKey: @"Writing file"} mutableCopy];
+    progDict    = @{PRIndeterminateKey: @YES,
+                    PRNewLineKey: @YES,
+                    PRDescriptionKey: @"Writing file"};
 
 #ifdef OTX_CLI
     [iController reportProgress: progDict];
@@ -268,7 +268,7 @@
         }
     }
 
-    progDict = [@{PRCompleteKey: @YES} mutableCopy];
+    progDict = @{PRCompleteKey: @YES};
 
 #ifdef OTX_CLI
     [iController reportProgress: progDict];
@@ -357,7 +357,7 @@
 {
     char cmdString[MAX_UNIBIN_OTOOL_CMD_SIZE] = "";
     NSString* otoolPath = [NSString stringWithFormat:@"\"%@\"", [self pathForTool: @"otool"]];
-    NSUInteger otoolPathLength = [otoolPath length];
+    NSUInteger otoolPathLength = otoolPath.length;
     size_t archStringLength = strlen(iArchString);
 
     // otool freaks out when somebody says -arch and it's not a unibin.
@@ -368,7 +368,7 @@
             return NO;
 
         snprintf(cmdString, MAX_UNIBIN_OTOOL_CMD_SIZE,
-            "%s -arch %s", [otoolPath UTF8String], iArchString);
+            "%s -arch %s", otoolPath.UTF8String, iArchString);
     }
     else
     {
@@ -376,10 +376,10 @@
         if (otoolPathLength >= MAX_UNIBIN_OTOOL_CMD_SIZE)
             return NO;
 
-        strncpy(cmdString, [otoolPath UTF8String], otoolPathLength);
+        strncpy(cmdString, otoolPath.UTF8String, otoolPathLength);
     }
 
-    NSString* oPath = [iOFile path];
+    NSString* oPath = iOFile.path;
     NSString* otoolString = [NSString stringWithFormat:
         @"%s %s -s __TEXT %s \"%@\"%s", cmdString,
         (inVerbose) ? "-V" : "-v", inSectionName, oPath,
@@ -595,8 +595,8 @@
             else
                 ioLine->chars[ioLine->length - 1] = 0;
 
-            NSFileHandle* filtWrite = [iCPFiltInputPipe fileHandleForWriting];
-            NSFileHandle* filtRead = [iCPFiltOutputPipe fileHandleForReading];
+            NSFileHandle* filtWrite = iCPFiltInputPipe.fileHandleForWriting;
+            NSFileHandle* filtRead = iCPFiltOutputPipe.fileHandleForReading;
             NSMutableData* dataToWrite = [NSMutableData dataWithBytes: ioLine->chars
                                                                length: strlen(ioLine->chars)];
 
@@ -607,7 +607,7 @@
                 [filtWrite writeData: dataToWrite];
             }
             @catch (NSException* e) {
-                NSLog(@"otx: [Exe64Processor processLine:] failed to write to c++filt: %@", [e reason]);
+                NSLog(@"otx: [Exe64Processor processLine:] failed to write to c++filt: %@", e.reason);
             }
 
             NSData* readData = nil;
@@ -616,14 +616,14 @@
                 readData = [filtRead availableData];
             }
             @catch (NSException* e) {
-                NSLog(@"otx: [Exe64Processor processLine:] failed to read from c++filt: %@", [e reason]);
+                NSLog(@"otx: [Exe64Processor processLine:] failed to read from c++filt: %@", e.reason);
             }
 
             [readData getBytes: demangledName];
 
             if (readData != nil)
             {
-                NSUInteger demangledDataLength = [readData length];
+                NSUInteger demangledDataLength = readData.length;
                 NSUInteger demangledStringLength = MIN(demangledDataLength, MAX_LINE_LENGTH - 1);
 
                 if (demangledStringLength < demangledDataLength)
@@ -1015,8 +1015,8 @@
         {
             char demangledName[MAX_OPERANDS_LENGTH];
 
-            NSFileHandle* filtWrite = [iCPFiltInputPipe fileHandleForWriting];
-            NSFileHandle* filtRead = [iCPFiltOutputPipe fileHandleForReading];
+            NSFileHandle* filtWrite = iCPFiltInputPipe.fileHandleForWriting;
+            NSFileHandle* filtRead = iCPFiltOutputPipe.fileHandleForReading;
             NSMutableData* dataToWrite = [NSMutableData dataWithBytes: iLineOperandsCString
                                                                length: strlen(iLineOperandsCString)];
 
@@ -1027,21 +1027,21 @@
                 [filtWrite writeData: dataToWrite];
             }
             @catch (NSException* e) {
-                NSLog(@"otx: [Exe64Processor processCodeLine:] failed to write operands to c++filt: %@", [e reason]);
+                NSLog(@"otx: [Exe64Processor processCodeLine:] failed to write operands to c++filt: %@", e.reason);
             }
 
             NSData* readData = nil;
 
             @try {
-                readData = [filtRead availableData];
+                readData = filtRead.availableData;
             }
             @catch (NSException* e) {
-                NSLog(@"otx: [Exe64Processor processCodeLine:] failed to read operands from c++filt: %@", [e reason]);
+                NSLog(@"otx: [Exe64Processor processCodeLine:] failed to read operands from c++filt: %@", e.reason);
             }
 
             if (readData != nil)
             {
-                NSUInteger demangledDataLength = [readData length];
+                NSUInteger demangledDataLength = readData.length;
                 NSUInteger demangledStringLength = MIN(demangledDataLength, MAX_OPERANDS_LENGTH - 1);
 
                 if (demangledStringLength < demangledDataLength)
@@ -1070,8 +1070,8 @@
         {
             char    demangledName[MAX_COMMENT_LENGTH];
 
-            NSFileHandle* filtWrite = [iCPFiltInputPipe fileHandleForWriting];
-            NSFileHandle* filtRead = [iCPFiltOutputPipe fileHandleForReading];
+            NSFileHandle* filtWrite = iCPFiltInputPipe.fileHandleForWriting;
+            NSFileHandle* filtRead = iCPFiltOutputPipe.fileHandleForReading;
             NSMutableData* dataToWrite = [NSMutableData dataWithBytes: theCommentCString
                                                                length: strlen(theCommentCString)];
 
@@ -1082,21 +1082,21 @@
                 [filtWrite writeData: dataToWrite];
             }
             @catch (NSException* e) {
-                NSLog(@"otx: [Exe64Processor processCodeLine:] failed to write comment to c++filt: %@", [e reason]);
+                NSLog(@"otx: [Exe64Processor processCodeLine:] failed to write comment to c++filt: %@", e.reason);
             }
 
             NSData* readData = nil;
 
             @try {
-                readData = [filtRead availableData];
+                readData = filtRead.availableData;
             }
             @catch (NSException* e) {
-                NSLog(@"otx: [Exe64Processor processCodeLine:] failed to read comment from c++filt: %@", [e reason]);
+                NSLog(@"otx: [Exe64Processor processCodeLine:] failed to read comment from c++filt: %@", e.reason);
             }
 
             if (readData != nil)
             {
-                NSUInteger demangledDataLength = [readData length];
+                NSUInteger demangledDataLength = readData.length;
                 NSUInteger demangledStringLength = MIN(demangledDataLength, MAX_COMMENT_LENGTH - 1);
 
                 if (demangledStringLength < demangledDataLength)
@@ -1464,12 +1464,12 @@
 
 - (void)insertMD5
 {
-    NSString* md5String = [self generateMD5String];
+    NSString* md5String = self.MD5String;
 
     Line64* newLine = calloc(1, sizeof(Line64));
-    const char* utf8String = [md5String UTF8String];
+    const char* utf8String = md5String.UTF8String;
 
-    newLine->length = [md5String length];
+    newLine->length = md5String.length;
     newLine->chars  = malloc(newLine->length + 1);
     strncpy(newLine->chars, utf8String, newLine->length + 1);
 

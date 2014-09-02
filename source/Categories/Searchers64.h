@@ -13,7 +13,7 @@
 
 @interface Exe64Processor(Searchers64)
 
-- (char*)findSymbolByAddress: (uint64_t)inAddress;
+- (char*)findSymbolByAddress: (uint64_t)inAddress NS_RETURNS_INNER_POINTER;
 - (BOOL)findClassMethod: (Method64Info**)outMI
               byAddress: (UInt64)inAddress;
 - (BOOL)findIvar: (objc2_64_ivar_t**)outIvar

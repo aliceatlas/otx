@@ -34,7 +34,7 @@
 + (void)initialize
 {
     NSUserDefaultsController*   theController   =
-        [NSUserDefaultsController sharedUserDefaultsController];
+        NSUserDefaultsController.sharedUserDefaultsController;
     NSDictionary*               theValues       =
         @{AskOutputDirKey:          @"1",
           DemangleCppNamesKey:      @"YES",
@@ -60,7 +60,7 @@
 //  init
 // ----------------------------------------------------------------------------
 
-- (id)init
+- (instancetype)init
 {
     if ((self = [super init]) == nil)
         return nil;
@@ -100,7 +100,7 @@
 - (void)newPackageFile: (NSURL*)inPackageFile
 {
 
-    iOutputFilePath = [inPackageFile path];
+    iOutputFilePath = inPackageFile.path;
 
     NSBundle*   exeBundle   = [NSBundle bundleWithPath: iOutputFilePath];
 
@@ -111,7 +111,7 @@
         return;
     }
 
-    NSString*   theExePath  = [exeBundle executablePath];
+    NSString*   theExePath  = exeBundle.executablePath;
 
     if (!theExePath)
     {
@@ -140,9 +140,8 @@
         iOutputFilePath = iObjectFile.path;
     }
 
-    if ([[NSWorkspace sharedWorkspace] isFilePackageAtPath: iOutputFilePath])
-        iExeName    = [iOutputFilePath.lastPathComponent
-            stringByDeletingPathExtension];
+    if ([NSWorkspace.sharedWorkspace isFilePackageAtPath: iOutputFilePath])
+        iExeName    = iOutputFilePath.lastPathComponent.stringByDeletingPathExtension;
     else
         iExeName    = iOutputFilePath.lastPathComponent;
 
@@ -202,12 +201,13 @@
                                        forEdge: NSMinYEdge];
 
         // Set up text shadows.
-        [iPathText.cell setBackgroundStyle: NSBackgroundStyleRaised];
-        [iPathLabelText.cell setBackgroundStyle: NSBackgroundStyleRaised];
-        [iTypeText.cell setBackgroundStyle: NSBackgroundStyleRaised];
-        [iTypeLabelText.cell setBackgroundStyle: NSBackgroundStyleRaised];
-        [iOutputLabelText.cell setBackgroundStyle: NSBackgroundStyleRaised];
-        [iProgText.cell setBackgroundStyle: NSBackgroundStyleRaised];
+        NSCell *(^cell)(NSControl *) = ^NSCell *(NSControl *control) { return (NSCell *)control.cell; };
+        cell(iPathText).backgroundStyle = NSBackgroundStyleRaised;
+        cell(iPathLabelText).backgroundStyle = NSBackgroundStyleRaised;
+        cell(iTypeText).backgroundStyle = NSBackgroundStyleRaised;
+        cell(iTypeLabelText).backgroundStyle = NSBackgroundStyleRaised;
+        cell(iOutputLabelText).backgroundStyle = NSBackgroundStyleRaised;
+        cell(iProgText).backgroundStyle = NSBackgroundStyleRaised;
     }
     else
     {
@@ -253,10 +253,10 @@
     {
         NSMutableAttributedString*  newString   =
             [[NSMutableAttributedString alloc] initWithAttributedString:
-            [inText attributedStringValue]];
+            inText.attributedStringValue];
 
         [newString addAttribute: NSShadowAttributeName value: iTextShadow
-            range: NSMakeRange(0, [newString length])];
+            range: NSMakeRange(0, newString.length)];
         inText.attributedStringValue = newString;
     }
 }
@@ -267,7 +267,7 @@
 
 - (IBAction)selectArch: (id)sender
 {
-    CPUID*  selectedCPU = (CPUID*)[[iArchPopup selectedItem] tag];
+    CPUID*  selectedCPU = (CPUID*)iArchPopup.selectedItem.tag;
 
     iSelectedArchCPUType        = selectedCPU->type;
     iSelectedArchCPUSubType     = selectedCPU->subtype;
@@ -332,7 +332,7 @@
 
     NSString*   theTempOutputFilePath   = iOutputFilePath;
 
-    if ([[NSUserDefaults standardUserDefaults] boolForKey: AskOutputDirKey])
+    if ([NSUserDefaults.standardUserDefaults boolForKey: AskOutputDirKey])
     {
         NSSavePanel*    thePanel    = [NSSavePanel savePanel];
 
@@ -347,7 +347,7 @@
     else
     {
         iOutputFilePath =
-            [[theTempOutputFilePath stringByDeletingLastPathComponent]
+            [theTempOutputFilePath.stringByDeletingLastPathComponent
             stringByAppendingPathComponent: iOutputText.stringValue];
     }
 
@@ -385,19 +385,19 @@
         switch (iSelectedArchCPUType)
         {
             case CPU_TYPE_POWERPC:
-                procClass = [PPCProcessor class];
+                procClass = PPCProcessor.class;
                 break;
 
             case CPU_TYPE_POWERPC64:
-                procClass = [PPC64Processor class];
+                procClass = PPC64Processor.class;
                 break;
 
             case CPU_TYPE_I386:
-                procClass = [X86Processor class];
+                procClass = X86Processor.class;
                 break;
 
             case CPU_TYPE_X86_64:
-                procClass = [X8664Processor class];
+                procClass = X8664Processor.class;
                 break;
 
             default:
@@ -415,7 +415,7 @@
         }
 
         // Save defaults into the ProcOptions struct.
-        NSUserDefaults* theDefaults = [NSUserDefaults standardUserDefaults];
+        NSUserDefaults* theDefaults = NSUserDefaults.standardUserDefaults;
         ProcOptions     opts        = {0};
 
         opts.localOffsets           =
@@ -453,7 +453,7 @@
         if (![theProcessor processExe: iOutputFilePath])
         {
             NSString* resultString = (gCancel == YES) ? PROCESS_SUCCESS :
-                [NSString stringWithFormat: @"Unable to process %@.", [iObjectFile path]];
+                [NSString stringWithFormat: @"Unable to process %@.", iObjectFile.path];
 
             [self performSelectorOnMainThread: @selector(processingThreadDidFinish:)
                                    withObject: resultString
@@ -479,7 +479,7 @@
     if ([result isEqualTo: PROCESS_SUCCESS])
     {
         [self hideProgView: YES openFile: (gCancel == YES) ? NO :
-            [[NSUserDefaults standardUserDefaults]
+            [NSUserDefaults.standardUserDefaults
             boolForKey: OpenOutputFileKey]];
     }
     else
@@ -568,8 +568,8 @@
     newWindowItem[NSXViewAnimationResizeViewsArrayKey] = @[iMainView, iProgView];
 
     // Since we're about to grow the window, first adjust the max height.
-    NSSize  maxSize = [iMainWindow contentMaxSize];
-    NSSize  minSize = [iMainWindow contentMinSize];
+    NSSize  maxSize = iMainWindow.contentMaxSize;
+    NSSize  minSize = iMainWindow.contentMinSize;
 
     maxSize.height  += progViewFrame.size.height;
     minSize.height  += progViewFrame.size.height;
@@ -729,7 +729,7 @@
     else
     {
         theThinOutputPath   =
-            [[iOutputFilePath stringByDeletingLastPathComponent]
+            [iOutputFilePath.stringByDeletingLastPathComponent
             stringByAppendingPathComponent:
             [iExeName stringByAppendingString: archExt]];
     }
@@ -745,7 +745,7 @@
     }
 
     NSString*   lipoString  = [NSString stringWithFormat:
-        @"lipo \"%@\" -output \"%@\" -thin %s", [iObjectFile path],
+        @"lipo \"%@\" -output \"%@\" -thin %s", iObjectFile.path,
         theThinOutputPath, selectedArchInfo->name];
 
     if (system(UTF8STRING(lipoString)) != 0)
@@ -886,11 +886,11 @@
 
 - (BOOL)validateMenuItem: (NSMenuItem*)menuItem
 {
-    if ([menuItem action] == @selector(attemptToProcessFile:))
+    if (menuItem.action == @selector(attemptToProcessFile:))
     {
-        NSUserDefaults* theDefaults = [NSUserDefaults standardUserDefaults];
+        NSUserDefaults* defaults = NSUserDefaults.standardUserDefaults;
 
-        if ([theDefaults boolForKey: AskOutputDirKey])
+        if ([defaults boolForKey: AskOutputDirKey])
             menuItem.title = [NSString stringWithFormat: @"Save..."];
         else
             menuItem.title = @"Save";
@@ -924,7 +924,7 @@
     [iArchPopup removeAllItems];
 
     NSFileHandle*   theFileH            =
-        [NSFileHandle fileHandleForReadingAtPath: [iObjectFile path]];
+        [NSFileHandle fileHandleForReadingAtPath: iObjectFile.path];
     NSData* fileData;
 
     // Read a generous number of bytes from the executable.
@@ -938,18 +938,18 @@
     {
         fprintf(stderr, "otx: -[AppController syncDescriptionText]: "
             "unable to read from executable file. %s\n",
-            UTF8STRING([e reason]));
+            UTF8STRING(e.reason));
         return;
     }
 
-    if ([fileData length] < sizeof(mach_header))
+    if (fileData.length < sizeof(mach_header))
     {
         fprintf(stderr, "otx: -[AppController syncDescriptionText]: "
             "truncated executable file.\n");
         return;
     }
 
-    const char* fileBytes   = [fileData bytes];
+    const char* fileBytes   = fileData.bytes;
 
     iFileArchMagic = *(uint32_t*)fileBytes;
 
@@ -972,7 +972,7 @@
     [self applyShadowToText: iPathText];
 
     mach_header mh = *(mach_header*)fileBytes;
-    NSMenu*     archMenu    = [iArchPopup menu];
+    NSMenu*     archMenu    = iArchPopup.menu;
     NSMenuItem* menuItem    = NULL;
 
     iSelectedArchCPUType    = iHostInfo.cpu_type;
@@ -1008,10 +1008,9 @@
             // Get the arch name for the popup.
             const NXArchInfo* archInfo = NXGetArchInfoFromCpuType(
                 fatArch.cputype, fatArch.cpusubtype);
-            NSString* archName = [NSString stringWithUTF8String: archInfo->name];
 
             // Add the menu item with refcon.
-            menuItem = [[NSMenuItem alloc] initWithTitle: archName
+            menuItem = [[NSMenuItem alloc] initWithTitle: @(archInfo->name)
                 action: NULL keyEquivalent: @""];
             menuItem.tag = (NSInteger)&iCPUIDs[i];
             [archMenu addItem: menuItem];
@@ -1028,7 +1027,7 @@
         NSString* archName = nil;
 
         if (archInfo != NULL)
-            archName = [NSString stringWithUTF8String: archInfo->name];
+            archName = @(archInfo->name);
 
         if (archName)
         {   // Add the menu item with refcon.
@@ -1077,7 +1076,7 @@
                 iSelectedArchCPUSubType = mh.cpusubtype;
 
             if (archInfo != NULL)
-                tempString = [NSString stringWithUTF8String: archInfo->name];
+                tempString = @(archInfo->name);
 
             break;
         }
@@ -1207,7 +1206,7 @@
     if (!iFileIsValid || iProcessing)
         return;
 
-    NSUserDefaults* theDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults* theDefaults = NSUserDefaults.standardUserDefaults;
     NSString*       theString   = nil;
 
     if ([theDefaults boolForKey: UseCustomNameKey])
@@ -1252,7 +1251,6 @@
 
     // Load views.
     NSUInteger  numViews    = toolbar.items.count;
-    NSUInteger  i;
 
     iPrefsViews     = [[NSMutableArray alloc] initWithCapacity:numViews];
     iPrefsViews[0]  = iPrefsGeneralView;
@@ -1268,8 +1266,8 @@
     [iPrefsWindow setFrame: [iPrefsWindow frameRectForContentRect:
                              ((NSView *)iPrefsViews[iPrefsCurrentViewIndex]).frame] display: NO];
 
-    for (i = 0; i < numViews; i++)
-        [[iPrefsWindow contentView] addSubview: iPrefsViews[i]];
+    for (NSView *view in iPrefsViews)
+        [iPrefsWindow.contentView addSubview: view];
 }
 
 //  showPrefs
@@ -1430,21 +1428,21 @@
     if (inDropBox != iDropBox || iProcessing)
         return NSDragOperationNone;
 
-    NSPasteboard*   pasteBoard  = [inItem draggingPasteboard];
+    NSPasteboard*   pasteBoard  = inItem.draggingPasteboard;
 
     // Bail if not a file.
-    if (![[pasteBoard types] containsObject: NSFilenamesPboardType])
+    if (![pasteBoard.types containsObject: NSFilenamesPboardType])
         return NSDragOperationNone;
 
     NSArray*    files   = [pasteBoard
         propertyListForType: NSFilenamesPboardType];
 
     // Bail if not a single file.
-    if ([files count] != 1)
+    if (files.count != 1)
         return NSDragOperationNone;
 
     // Bail if a folder.
-    NSFileManager*  fileMan = [NSFileManager defaultManager];
+    NSFileManager*  fileMan = NSFileManager.defaultManager;
     BOOL            isDirectory = NO;
     NSString*       filePath = files[0];
     NSString*       oFilePath = filePath;
@@ -1454,11 +1452,11 @@
     {
         if (isDirectory)
         {
-            if ([[NSWorkspace sharedWorkspace] isFilePackageAtPath: filePath])
+            if ([NSWorkspace.sharedWorkspace isFilePackageAtPath: filePath])
             {
                 NSBundle*   exeBundle   = [NSBundle bundleWithPath: filePath];
 
-                oFilePath = [exeBundle executablePath];
+                oFilePath = exeBundle.executablePath;
 
                 if (oFilePath == nil)
                     return NSDragOperationNone;
@@ -1482,12 +1480,11 @@
     @catch (NSException* e)
     {
         fprintf(stderr, "otx: -[AppController dropBox:dragDidEnter:]: "
-            "unable to read from executable file: %s\n",
-            [filePath UTF8String]);
+            "unable to read from executable file: %s\n", filePath.UTF8String);
         return NSDragOperationNone;
     }
 
-    magic = *(uint32_t*)[fileData bytes];
+    magic = *(uint32_t*)fileData.bytes;
 
     switch (magic)
     {
@@ -1503,7 +1500,7 @@
             return NSDragOperationNone;
     }
 
-    NSDragOperation sourceDragMask  = [inItem draggingSourceOperationMask];
+    NSDragOperation sourceDragMask  = inItem.draggingSourceOperationMask;
 
     // Bail if modifier keys pressed.
     if (!(sourceDragMask & NSDragOperationLink))
@@ -1521,12 +1518,12 @@
     if (inDropBox != iDropBox || iProcessing)
         return NO;
 
-    NSURL*  theURL  = [NSURL URLFromPasteboard: [inItem draggingPasteboard]];
+    NSURL*  theURL  = [NSURL URLFromPasteboard: inItem.draggingPasteboard];
 
     if (!theURL)
         return NO;
 
-    if ([[NSWorkspace sharedWorkspace] isFilePackageAtPath: [theURL path]])
+    if ([NSWorkspace.sharedWorkspace isFilePackageAtPath: theURL.path])
         [self newPackageFile: theURL];
     else
         [self newOFile: theURL needsPath: YES];
@@ -1544,10 +1541,10 @@
 
 - (BOOL)animationShouldStart: (NSAnimation*)animation
 {
-    if (![animation isKindOfClass: [NSViewAnimation class]])
+    if (![animation isKindOfClass: NSViewAnimation.class])
         return YES;
 
-    NSArray*    animatedViews   = [(NSViewAnimation*)animation viewAnimations];
+    NSArray*    animatedViews   = ((NSViewAnimation*)animation).viewAnimations;
 
     if (!animatedViews)
         return YES;
@@ -1623,10 +1620,10 @@
 
 - (void)animationDidEnd: (NSAnimation*)animation
 {
-    if (![animation isKindOfClass: [NSViewAnimation class]])
+    if (![animation isKindOfClass: NSViewAnimation.class])
         return;
 
-    NSArray*    animatedViews   = [(NSViewAnimation*)animation viewAnimations];
+    NSArray*    animatedViews   = ((NSViewAnimation*)animation).viewAnimations;
 
     if (!animatedViews)
         return;
@@ -1647,7 +1644,7 @@
         if (!effectsNumber)
             continue;
 
-        uint32_t  effects = [effectsNumber unsignedIntValue];
+        uint32_t  effects = effectsNumber.unsignedIntValue;
 
         if (effects & NSXViewAnimationSwapAtEndEffect)
         {   // Hide/show 2 views.
@@ -1681,8 +1678,8 @@
             NSView*     view;
             NSNumber*   mask;
             NSUInteger      i;
-            NSUInteger      numMasks    = [masks count];
-            NSUInteger      numViews    = [views count];
+            NSUInteger      numMasks    = masks.count;
+            NSUInteger      numViews    = views.count;
 
             if (numMasks != numViews)
                 continue;
@@ -1820,7 +1817,7 @@
 
 - (void)controlTextDidChange: (NSNotification*)inNotification
 {
-    switch ([[inNotification object] tag])
+    switch ([inNotification.object tag])
     {
         case kOutputTextTag:
             [self syncSaveButton];
@@ -1910,7 +1907,7 @@ willBeInsertedIntoToolbar: (BOOL)willBeInserted
 
 - (void)windowDidResize: (NSNotification*)inNotification
 {
-    if ([inNotification object] == iMainWindow)
+    if (inNotification.object == iMainWindow)
         [iMainWindow display];
 }
 

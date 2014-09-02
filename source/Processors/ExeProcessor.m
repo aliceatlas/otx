@@ -30,7 +30,7 @@
 //  initWithURL:controller:options:
 // ----------------------------------------------------------------------------
 
-- (id)initWithURL: (NSURL*)inURL
+- (instancetype)initWithURL: (NSURL*)inURL
        controller: (id)inController
           options: (ProcOptions*)inOptions
 {
@@ -53,11 +53,11 @@
     if (!theData)
     {
         fprintf(stderr, "otx: error loading executable from disk: %s\n",
-            UTF8STRING([theError localizedFailureReason]));
+            UTF8STRING(theError.localizedFailureReason));
         return nil;
     }
 
-    iRAMFileSize    = [theData length];
+    iRAMFileSize    = theData.length;
 
     if (iRAMFileSize < sizeof(iFileArchMagic))
     {
@@ -112,16 +112,6 @@
     {
         free(iThunks);
         iThunks = NULL;
-    }
-
-    if (iCPFiltInputPipe)
-    {
-        iCPFiltInputPipe = nil;
-    }
-
-    if (iCPFiltOutputPipe)
-    {
-        iCPFiltOutputPipe = nil;
     }
 
     if (iCPFiltTask)
@@ -365,13 +355,13 @@
                   toFile: (FILE*)outFile
 {}
 
-- (NSString*)generateMD5String
+- (NSString*)MD5String
 {
     NSString* md5Path = [NSString pathWithComponents: @[@"/", @"sbin", @"md5"]];
     NSTask* md5Task = [[NSTask alloc] init];
     NSPipe* md5Pipe = [NSPipe pipe];
     NSPipe* errorPipe = [NSPipe pipe];
-    NSArray* args = @[@"-q", [iOFile path]];
+    NSArray* args = @[@"-q", iOFile.path];
 
     md5Task.launchPath = md5Path;
     md5Task.arguments = args;
@@ -385,13 +375,13 @@
     }
     @catch (NSException* e)
     {
-        NSLog(@"otx: unable to launch md5: %@", [e reason]);
+        NSLog(@"otx: unable to launch md5: %@", e.reason);
         return nil;
     }
 
     [md5Task waitUntilExit];
 
-    int md5Status = [md5Task terminationStatus];
+    int md5Status = md5Task.terminationStatus;
 
     if (md5Status != 0) // md5Task failed, log and bail
     {
@@ -399,17 +389,17 @@
 
         @try
         {
-            errorData = [[errorPipe fileHandleForReading] availableData];
+            errorData = errorPipe.fileHandleForReading.availableData;
         }
         @catch (NSException* e)
         {
-            NSLog(@"otx: unable to read data from md5 error for \"%@\": %@", [iOFile path], [e reason]);
+            NSLog(@"otx: unable to read data from md5 error for \"%@\": %@", iOFile.path, e.reason);
             return nil;
         }
 
         if (errorData == nil)
         {
-            NSLog(@"otx: md5 error data is nil for \"%@\"", [iOFile path]);
+            NSLog(@"otx: md5 error data is nil for \"%@\"", iOFile.path);
             return nil;
         }
 
@@ -428,7 +418,7 @@
 
     @try
     {
-        md5Data = [[md5Pipe fileHandleForReading] availableData];
+        md5Data = md5Pipe.fileHandleForReading.availableData;
     }
     @catch (NSException* e)
     {
@@ -436,7 +426,7 @@
         return nil;
     }
 
-    if (md5Data == nil || [md5Data length] == 0) // md5Task produced no data, log and bail
+    if (md5Data == nil || md5Data.length == 0) // md5Task produced no data, log and bail
     {
         NSLog(@"otx: unexpected failure while generating md5 checksum of \"%@\"", iOFile.path);
         return nil;

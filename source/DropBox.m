@@ -12,23 +12,14 @@
 #import "DropBox.h"
 
 @implementation DropBox
+@synthesize fillsRect = iFillRect;
 
 //  awakeFromNib
 // ----------------------------------------------------------------------------
 
 - (void)awakeFromNib
 {
-    [self registerForDraggedTypes:
-        @[NSFilenamesPboardType]];
-}
-
-//  setFillsRect:
-// ----------------------------------------------------------------------------
-//  Call setFillsRect: YES to draw the entire frame hilited with kFillAlpha.
-
-- (void)setFillsRect: (BOOL)inFill
-{
-    iFillRect   = inFill;
+    [self registerForDraggedTypes: @[NSFilenamesPboardType]];
 }
 
 //  draggingEntered:
@@ -130,7 +121,7 @@
         innerRect = NSInsetRect(innerRect, 1.0f, 1.0f);
     }
 
-    if (iFillRect)
+    if (self.fillsRect)
     {
         if (borderType == NSNoBorder || borderType == NSLineBorder)
             innerRect = NSInsetRect(innerRect, -1.0f, -1.0f);

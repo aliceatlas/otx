@@ -243,9 +243,9 @@ FunctionInfo;
     uint32_t              iEndOfText;
 }
 
-- (id)initWithURL: (NSURL*)inURL
-       controller: (id)inController
-          options: (ProcOptions*)inOptions;
+- (instancetype)initWithURL: (NSURL*)inURL
+                 controller: (id)inController
+                    options: (ProcOptions*)inOptions NS_DESIGNATED_INITIALIZER;
 - (void)deleteFuncInfos;
 
 // processors
@@ -271,10 +271,10 @@ FunctionInfo;
 - (void)entabLine: (Line*)ioLine;
 - (BOOL)getIvarName:(char **)outName type:(char **)outType withOffset:(uint32_t)offset inClass:(objc_32_class_ptr)classPtr;
 - (char*)getPointer: (uint32_t)inAddr
-               type: (UInt8*)outType;
+               type: (UInt8*)outType NS_RETURNS_INNER_POINTER;
 
 - (char*)selectorForMsgSend: (char*)outComment
-                   fromLine: (Line*)inLine;
+                   fromLine: (Line*)inLine NS_RETURNS_INNER_POINTER;
 
 - (void)insertMD5;
 
