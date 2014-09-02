@@ -143,11 +143,8 @@
 
     [self loadLCommands];
 
-    NSMutableDictionary*    progDict    =
-        [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-        [NSNumber numberWithBool: YES], PRNewLineKey,
-        @"Calling otool", PRDescriptionKey,
-        nil];
+    NSMutableDictionary*    progDict    = [@{PRNewLineKey: @YES,
+                                            PRDescriptionKey: @"Calling otool"} mutableCopy];
 
 #ifdef OTX_CLI
     [iController reportProgress: progDict];
@@ -163,10 +160,8 @@
     if (gCancel == YES)
         return NO;
 
-    progDict    = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-        [NSNumber numberWithBool: YES], PRNewLineKey,
-        @"Gathering info", PRDescriptionKey,
-        nil];
+    progDict    = [@{PRNewLineKey: @YES,
+                     PRDescriptionKey: @"Gathering info"} mutableCopy];
 
 #ifdef OTX_CLI
     [iController reportProgress: progDict];
@@ -204,12 +199,10 @@
     uint32_t  progCounter = 0;
     double  progValue   = 0.0;
 
-    progDict    = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-        [NSNumber numberWithBool: NO], PRIndeterminateKey,
-        [NSNumber numberWithDouble: progValue], PRValueKey,
-        [NSNumber numberWithBool: YES], PRNewLineKey,
-        @"Generating file", PRDescriptionKey,
-        nil];
+    progDict    = [@{PRIndeterminateKey: @NO,
+                     PRValueKey: @(progValue),
+                     PRNewLineKey: @YES,
+                     PRDescriptionKey: @"Generating file"} mutableCopy];
 
 #ifdef OTX_CLI
     [iController reportProgress: progDict];
@@ -231,9 +224,7 @@
                 return NO;
 
             progValue   = (double)progCounter / iNumLines * 100;
-            progDict    = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                [NSNumber numberWithDouble: progValue], PRValueKey,
-                nil];
+            progDict    = [@{PRValueKey: @(progValue)} mutableCopy];
 
 #ifdef OTX_CLI
             [iController reportProgress: progDict];
@@ -262,11 +253,9 @@
     if (gCancel == YES)
         return NO;
 
-    progDict    = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-        [NSNumber numberWithBool: YES], PRIndeterminateKey,
-        [NSNumber numberWithBool: YES], PRNewLineKey,
-        @"Writing file", PRDescriptionKey,
-        nil];
+    progDict    = [@{PRIndeterminateKey: @YES,
+                     PRNewLineKey: @YES,
+                     PRDescriptionKey: @"Writing file"} mutableCopy];
 
 #ifdef OTX_CLI
     [iController reportProgress: progDict];
@@ -291,9 +280,7 @@
         }
     }
 
-    progDict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-        [NSNumber numberWithBool: YES], PRCompleteKey,
-        nil];
+    progDict = [@{PRCompleteKey: @YES} mutableCopy];
 
 #ifdef OTX_CLI
     [iController reportProgress: progDict];

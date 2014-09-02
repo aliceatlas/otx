@@ -24,15 +24,11 @@
     if ((self = [super initWithViewAnimations: viewAnimations]))
     {
         // Find the first window object in the array.
-        NSUInteger  numAnimations = [viewAnimations count];
-        NSUInteger  i;
-        id      object;
         Class   windowClass = [NSWindow class];
 
-        for (i = 0; i < numAnimations; i++)
+        for (id animObject in viewAnimations)
         {
-            object = [[viewAnimations objectAtIndex: i]
-                objectForKey: NSViewAnimationTargetKey];
+            id object = animObject[NSViewAnimationTargetKey];
 
             if ([object isKindOfClass: windowClass])
             {
@@ -51,14 +47,14 @@
 - (void)setCurrentProgress: (NSAnimationProgress)progress
 {
     // Call super to update the progress value.
-    [super setCurrentProgress: progress];
+    super.currentProgress = progress;
 
     if (!iWindow)   // can't do much without a window
         return;
 
     // Update the window position. As stupid as this looks, [mWindow display]
     // just doesn't cut it.
-    [iWindow setFrame: [iWindow frame] display: YES animate: YES];
+    [iWindow setFrame: iWindow.frame display: YES animate: YES];
 }
 
 @end

@@ -21,10 +21,10 @@
     NSTask* otoolTask = [[[NSTask alloc] init] autorelease];
     NSPipe* silence = [NSPipe pipe];
 
-    [otoolTask setLaunchPath: otoolPath];
-    [otoolTask setStandardInput: [NSPipe pipe]];
-    [otoolTask setStandardOutput: silence];
-    [otoolTask setStandardError: silence];
+    otoolTask.launchPath = otoolPath;
+    otoolTask.standardInput = [NSPipe pipe];
+    otoolTask.standardOutput = silence;
+    otoolTask.standardError = silence;
     [otoolTask launch];
     [otoolTask waitUntilExit];
 
@@ -36,19 +36,18 @@
 
 - (NSString*)pathForTool: (NSString*)toolName
 {
-    NSString* relToolBase = [NSString pathWithComponents:
-        [NSArray arrayWithObjects: @"/", @"usr", @"bin", nil]];
+    NSString* relToolBase = [NSString pathWithComponents: @[@"/", @"usr", @"bin"]];
     NSString* relToolPath = [relToolBase stringByAppendingPathComponent: toolName];
 
     NSString* xcrunToolPath = [relToolBase stringByAppendingPathComponent: @"xcrun"];
     NSTask* xcrunTask = [[[NSTask alloc] init] autorelease];
     NSPipe* xcrunPipe = [NSPipe pipe];
-    NSArray* args = [NSArray arrayWithObjects: @"--find", toolName, nil];
+    NSArray* args = @[@"--find", toolName];
 
-    [xcrunTask setLaunchPath: xcrunToolPath];
-    [xcrunTask setArguments: args];
-    [xcrunTask setStandardInput: [NSPipe pipe]];
-    [xcrunTask setStandardOutput: xcrunPipe];
+    xcrunTask.launchPath = xcrunToolPath;
+    xcrunTask.arguments = args;
+    xcrunTask.standardInput = [NSPipe pipe];
+    xcrunTask.standardOutput = xcrunPipe;
     [xcrunTask launch];
     [xcrunTask waitUntilExit];
 

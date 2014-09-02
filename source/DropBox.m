@@ -19,7 +19,7 @@
 - (void)awakeFromNib
 {
     [self registerForDraggedTypes:
-        [NSArray arrayWithObject: NSFilenamesPboardType]];
+        @[NSFilenamesPboardType]];
 }
 
 //  setFillsRect:
@@ -46,7 +46,7 @@
         return dragOp;
 
     iShowHilite = YES;
-    [self setNeedsDisplay: YES];
+    self.needsDisplay = YES;
 
     return dragOp;
 }
@@ -57,7 +57,7 @@
 - (void)draggingExited: (id<NSDraggingInfo>)sender
 {
     iShowHilite = NO;
-    [self setNeedsDisplay: YES];
+    self.needsDisplay = YES;
 
     if (iDelegate && [iDelegate respondsToSelector:
         @selector(dropBox:dragDidExit:)])
@@ -70,7 +70,7 @@
 - (BOOL)performDragOperation: (id<NSDraggingInfo>)sender
 {
     iShowHilite = NO;
-    [self setNeedsDisplay: YES];
+    self.needsDisplay = YES;
 
     if (!iDelegate)
         return NO;

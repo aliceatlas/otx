@@ -2695,9 +2695,7 @@
         return nil;
     }
 
-    NSDictionary*   permsDict   = [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSNumber numberWithUnsignedInteger: [fileAttrs filePosixPermissions]],
-        NSFilePosixPermissions, nil];
+    NSDictionary*   permsDict   = @{NSFilePosixPermissions: @([fileAttrs filePosixPermissions])};
 
     if (![fileMan setAttributes:permsDict ofItemAtPath:[newURL path] error:nil])
     {

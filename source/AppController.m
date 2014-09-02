@@ -36,27 +36,25 @@
     NSUserDefaultsController*   theController   =
         [NSUserDefaultsController sharedUserDefaultsController];
     NSDictionary*               theValues       =
-        [NSDictionary dictionaryWithObjectsAndKeys:
-        @"1",       AskOutputDirKey,
-        @"YES",     DemangleCppNamesKey,
-        @"NO",      EntabOutputKey,
-        @"YES",     OpenOutputFileKey,
-        @"BBEdit",  OutputAppKey,
-        @"txt",     OutputFileExtensionKey,
-        @"output",  OutputFileNameKey,
-        @"NO",      SeparateLogicalBlocksKey,
-        @"NO",      ShowDataSectionKey,
-        @"YES",     ShowIvarTypesKey,
-        @"YES",     ShowLocalOffsetsKey,
-        @"YES",     ShowMD5Key,
-        @"YES",     ShowMethodReturnTypesKey,
-        @"YES",     ShowReturnStatementsKey,
-        @"0",       UseCustomNameKey,
-        @"YES",     VerboseMsgSendsKey,
-        nil];
-
-    [theController setInitialValues: theValues];
-    [[theController defaults] registerDefaults: theValues];
+        @{AskOutputDirKey:          @"1",
+          DemangleCppNamesKey:      @"YES",
+          EntabOutputKey:           @"NO",
+          OpenOutputFileKey:        @"YES",
+          OutputAppKey:             @"BBEdit",
+          OutputFileExtensionKey:   @"txt",
+          OutputFileNameKey:        @"output",
+          SeparateLogicalBlocksKey: @"NO",
+          ShowDataSectionKey:       @"NO",
+          ShowIvarTypesKey:         @"YES",
+          ShowLocalOffsetsKey:      @"YES",
+          ShowMD5Key:               @"YES",
+          ShowMethodReturnTypesKey: @"YES",
+          ShowReturnStatementsKey:  @"YES",
+          UseCustomNameKey:         @"0",
+          VerboseMsgSendsKey:       @"YES"};
+    
+    theController.initialValues = theValues;
+    [theController.defaults registerDefaults: theValues];
 }
 
 //  init
@@ -112,12 +110,12 @@
 {
     NSOpenPanel*    thePanel    = [NSOpenPanel openPanel];
 
-    [thePanel setTreatsFilePackagesAsDirectories: YES];
+    thePanel.treatsFilePackagesAsDirectories = YES;
 
     if ([thePanel runModal] != NSFileHandlingPanelOKButton)
         return;
 
-    NSString*   theName = [[thePanel URL] path];
+    NSString*   theName = thePanel.URL.path;
 
     [self newOFile: [NSURL fileURLWithPath: theName] needsPath: YES];
 }
@@ -177,15 +175,15 @@
         if (iOutputFilePath)
             [iOutputFilePath release];
 
-        iOutputFilePath = [iObjectFile path];
+        iOutputFilePath = iObjectFile.path;
         [iOutputFilePath retain];
     }
 
     if ([[NSWorkspace sharedWorkspace] isFilePackageAtPath: iOutputFilePath])
-        iExeName    = [[iOutputFilePath lastPathComponent]
+        iExeName    = [iOutputFilePath.lastPathComponent
             stringByDeletingPathExtension];
     else
-        iExeName    = [iOutputFilePath lastPathComponent];
+        iExeName    = iOutputFilePath.lastPathComponent;
 
     [iExeName retain];
 
@@ -203,35 +201,35 @@
     if (OS_IS_POST_TIGER)
     {   // Adjust main window for Leopard.
         // Save the resize masks and apply new ones.
-        NSUInteger  origMainViewMask    = [iMainView autoresizingMask];
-        NSUInteger  origProgViewMask    = [iProgView autoresizingMask];
+        NSUInteger  origMainViewMask    = iMainView.autoresizingMask;
+        NSUInteger  origProgViewMask    = iProgView.autoresizingMask;
 
-        [iMainView setAutoresizingMask: NSViewMaxYMargin];
-        [iProgView setAutoresizingMask: NSViewMaxYMargin];
+        iMainView.autoresizingMask = NSViewMaxYMargin;
+        iProgView.autoresizingMask = NSViewMaxYMargin;
 
-        NSRect  curFrame    = [iMainWindow frame];
-        NSSize  maxSize     = [iMainWindow contentMaxSize];
-        NSSize  minSize     = [iMainWindow contentMinSize];
+        NSRect  curFrame    = iMainWindow.frame;
+        NSSize  maxSize     = iMainWindow.contentMaxSize;
+        NSSize  minSize     = iMainWindow.contentMinSize;
 
         curFrame.size.height    -= UNIFIED_TOOLBAR_DELTA;
         minSize.height          -= UNIFIED_TOOLBAR_DELTA - CONTENT_BORDER_MARGIN_BOTTOM;
         maxSize.height          -= UNIFIED_TOOLBAR_DELTA - CONTENT_BORDER_MARGIN_BOTTOM;
 
-        [iMainWindow setContentMinSize: minSize];
+        iMainWindow.contentMinSize = minSize;
         [iMainWindow setFrame: curFrame
                       display: YES];
-        [iMainWindow setContentMaxSize: maxSize];
+        iMainWindow.contentMaxSize = maxSize;
 
         // Grow the prog view for the gradient.
-        [iMainView setAutoresizingMask: NSViewMinYMargin | NSViewNotSizable];
-        [iProgView setAutoresizingMask: NSViewHeightSizable | NSViewMaxYMargin];
+        iMainView.autoresizingMask = NSViewMinYMargin | NSViewNotSizable;
+        iProgView.autoresizingMask = NSViewHeightSizable | NSViewMaxYMargin;
 
         curFrame.size.height += CONTENT_BORDER_MARGIN_BOTTOM;
         [iMainWindow setFrame: curFrame
                       display: YES];
 
-        [iMainView setAutoresizingMask: origMainViewMask];
-        [iProgView setAutoresizingMask: origProgViewMask];
+        iMainView.autoresizingMask = origMainViewMask;
+        iProgView.autoresizingMask = origProgViewMask;
 
         // Set up smaller gradients.
         [iMainWindow setAutorecalculatesContentBorderThickness: NO
@@ -244,19 +242,18 @@
                                        forEdge: NSMinYEdge];
 
         // Set up text shadows.
-        [[iPathText cell] setBackgroundStyle: NSBackgroundStyleRaised];
-        [[iPathLabelText cell] setBackgroundStyle: NSBackgroundStyleRaised];
-        [[iTypeText cell] setBackgroundStyle: NSBackgroundStyleRaised];
-        [[iTypeLabelText cell] setBackgroundStyle: NSBackgroundStyleRaised];
-        [[iOutputLabelText cell] setBackgroundStyle: NSBackgroundStyleRaised];
-        [[iProgText cell] setBackgroundStyle: NSBackgroundStyleRaised];
+        [iPathText.cell setBackgroundStyle: NSBackgroundStyleRaised];
+        [iPathLabelText.cell setBackgroundStyle: NSBackgroundStyleRaised];
+        [iTypeText.cell setBackgroundStyle: NSBackgroundStyleRaised];
+        [iTypeLabelText.cell setBackgroundStyle: NSBackgroundStyleRaised];
+        [iOutputLabelText.cell setBackgroundStyle: NSBackgroundStyleRaised];
+        [iProgText.cell setBackgroundStyle: NSBackgroundStyleRaised];
     }
     else
     {
         NSImage*    bgImage = [NSImage imageNamed: @"Main Window Background"];
 
-        [iMainWindow setBackgroundColor:
-            [NSColor colorWithPatternImage: bgImage]];
+        iMainWindow.backgroundColor = [NSColor colorWithPatternImage: bgImage];
 
         // Set up text shadows.
         [self applyShadowToText: iPathLabelText];
@@ -269,7 +266,7 @@
     // resizes the window, which results in our delegate saving the day.
     [self hideProgView: NO openFile: NO];
 
-    [iMainWindow setFrameAutosaveName: [iMainWindow title]];
+    iMainWindow.frameAutosaveName = iMainWindow.title;
 //    [iArchPopup selectItemWithTag: iSelectedArchCPUType];
 }
 
@@ -300,7 +297,7 @@
 
         [newString addAttribute: NSShadowAttributeName value: iTextShadow
             range: NSMakeRange(0, [newString length])];
-        [inText setAttributedStringValue: newString];
+        inText.attributedStringValue = newString;
         [newString release];
     }
 }
@@ -329,16 +326,16 @@
     switch (iSelectedArchCPUType)
     {
         case CPU_TYPE_POWERPC:
-            [iVerifyButton setEnabled: NO];
+            iVerifyButton.enabled = NO;
             break;
         case CPU_TYPE_I386:
-            [iVerifyButton setEnabled: YES];
+            iVerifyButton.enabled = YES;
             break;
         case CPU_TYPE_POWERPC64:
-            [iVerifyButton setEnabled: NO];
+            iVerifyButton.enabled = NO;
             break;
         case CPU_TYPE_X86_64:
-            [iVerifyButton setEnabled: YES];
+            iVerifyButton.enabled = YES;
             break;
 
         default:
@@ -383,7 +380,7 @@
     if (iOutputFileName)
         [iOutputFileName release];
 
-    iOutputFileName = [iOutputText stringValue];
+    iOutputFileName = iOutputText.stringValue;
     [iOutputFileName retain];
 
     NSString*   theTempOutputFilePath   = iOutputFilePath;
@@ -394,8 +391,8 @@
     {
         NSSavePanel*    thePanel    = [NSSavePanel savePanel];
 
-        [thePanel setNameFieldStringValue:iOutputFileName];
-        [thePanel setTreatsFilePackagesAsDirectories: YES];
+        thePanel.nameFieldStringValue = iOutputFileName;
+        thePanel.treatsFilePackagesAsDirectories = YES;
 
         if ([thePanel runModal]  != NSFileHandlingPanelOKButton)
             return;
@@ -403,13 +400,13 @@
         if (iOutputFilePath)
             [iOutputFilePath release];
 
-        iOutputFilePath = [[thePanel URL] path];
+        iOutputFilePath = thePanel.URL.path;
     }
     else
     {
         iOutputFilePath =
             [[theTempOutputFilePath stringByDeletingLastPathComponent]
-            stringByAppendingPathComponent: [iOutputText stringValue]];
+            stringByAppendingPathComponent: iOutputText.stringValue];
     }
 
     [iOutputFilePath retain];
@@ -423,15 +420,14 @@
 
 - (void)processFile
 {
-    NSDictionary*   progDict    = [[NSDictionary alloc] initWithObjectsAndKeys:
-        [NSNumber numberWithBool: YES], PRIndeterminateKey,
-        @"Loading executable", PRDescriptionKey,
-        nil];
+    NSDictionary*   progDict    =
+        @{PRIndeterminateKey: @YES,
+          PRDescriptionKey:   @"Loading executable"};
 
     [self reportProgress: progDict];
     [progDict release];
 
-    if ([self checkOtool: [iObjectFile path]] == NO)
+    if ([self checkOtool: iObjectFile.path] == NO)
     {
         [self reportError: @"otool was not found."
                suggestion: @"Please install otool and try again."];
@@ -448,97 +444,94 @@
 
 - (void)continueProcessingFile
 {
-    NSAutoreleasePool*  pool        = [[NSAutoreleasePool alloc] init];
-    Class               procClass   = nil;
+    @autoreleasepool {
+        Class               procClass   = nil;
 
-    switch (iSelectedArchCPUType)
-    {
-        case CPU_TYPE_POWERPC:
-            procClass = [PPCProcessor class];
-            break;
+        switch (iSelectedArchCPUType)
+        {
+            case CPU_TYPE_POWERPC:
+                procClass = [PPCProcessor class];
+                break;
 
-        case CPU_TYPE_POWERPC64:
-            procClass = [PPC64Processor class];
-            break;
+            case CPU_TYPE_POWERPC64:
+                procClass = [PPC64Processor class];
+                break;
 
-        case CPU_TYPE_I386:
-            procClass = [X86Processor class];
-            break;
+            case CPU_TYPE_I386:
+                procClass = [X86Processor class];
+                break;
 
-        case CPU_TYPE_X86_64:
-            procClass = [X8664Processor class];
-            break;
+            case CPU_TYPE_X86_64:
+                procClass = [X8664Processor class];
+                break;
 
-        default:
-            fprintf(stderr, "otx: [AppController continueProcessingFile]: "
-                "unknown arch type: %d", iSelectedArchCPUType);
-            break;
-    }
+            default:
+                fprintf(stderr, "otx: [AppController continueProcessingFile]: "
+                    "unknown arch type: %d", iSelectedArchCPUType);
+                break;
+        }
 
-    if (!procClass)
-    {
+        if (!procClass)
+        {
+            [self performSelectorOnMainThread: @selector(processingThreadDidFinish:)
+                                   withObject: @"Unsupported architecture."
+                                waitUntilDone: NO];
+            return;
+        }
+
+        // Save defaults into the ProcOptions struct.
+        NSUserDefaults* theDefaults = [NSUserDefaults standardUserDefaults];
+        ProcOptions     opts        = {0};
+
+        opts.localOffsets           =
+            [theDefaults boolForKey: ShowLocalOffsetsKey];
+        opts.entabOutput            =
+            [theDefaults boolForKey: EntabOutputKey];
+        opts.dataSections           =
+            [theDefaults boolForKey: ShowDataSectionKey];
+        opts.checksum               =
+            [theDefaults boolForKey: ShowMD5Key];
+        opts.verboseMsgSends        =
+            [theDefaults boolForKey: VerboseMsgSendsKey];
+        opts.separateLogicalBlocks  =
+            [theDefaults boolForKey: SeparateLogicalBlocksKey];
+        opts.demangleCppNames       =
+            [theDefaults boolForKey: DemangleCppNamesKey];
+        opts.returnTypes            =
+            [theDefaults boolForKey: ShowMethodReturnTypesKey];
+        opts.variableTypes          =
+            [theDefaults boolForKey: ShowIvarTypesKey];
+        opts.returnStatements       =
+            [theDefaults boolForKey: ShowReturnStatementsKey];
+
+        id  theProcessor    = [[procClass alloc] initWithURL: iObjectFile
+            controller: self options: &opts];
+
+        if (!theProcessor)
+        {
+            [self performSelectorOnMainThread: @selector(processingThreadDidFinish:)
+                                   withObject: @"Unable to create processor."
+                                waitUntilDone: NO];
+            return;
+        }
+
+        if (![theProcessor processExe: iOutputFilePath])
+        {
+            NSString* resultString = (gCancel == YES) ? PROCESS_SUCCESS :
+                [NSString stringWithFormat: @"Unable to process %@.", [iObjectFile path]];
+
+            [self performSelectorOnMainThread: @selector(processingThreadDidFinish:)
+                                   withObject: resultString
+                                waitUntilDone: NO];
+            [theProcessor release];
+            return;
+        }
+
         [self performSelectorOnMainThread: @selector(processingThreadDidFinish:)
-                               withObject: @"Unsupported architecture."
-                            waitUntilDone: NO];
-        [pool release];
-        return;
-    }
-
-    // Save defaults into the ProcOptions struct.
-    NSUserDefaults* theDefaults = [NSUserDefaults standardUserDefaults];
-    ProcOptions     opts        = {0};
-
-    opts.localOffsets           =
-        [theDefaults boolForKey: ShowLocalOffsetsKey];
-    opts.entabOutput            =
-        [theDefaults boolForKey: EntabOutputKey];
-    opts.dataSections           =
-        [theDefaults boolForKey: ShowDataSectionKey];
-    opts.checksum               =
-        [theDefaults boolForKey: ShowMD5Key];
-    opts.verboseMsgSends        =
-        [theDefaults boolForKey: VerboseMsgSendsKey];
-    opts.separateLogicalBlocks  =
-        [theDefaults boolForKey: SeparateLogicalBlocksKey];
-    opts.demangleCppNames       =
-        [theDefaults boolForKey: DemangleCppNamesKey];
-    opts.returnTypes            =
-        [theDefaults boolForKey: ShowMethodReturnTypesKey];
-    opts.variableTypes          =
-        [theDefaults boolForKey: ShowIvarTypesKey];
-    opts.returnStatements       =
-        [theDefaults boolForKey: ShowReturnStatementsKey];
-
-    id  theProcessor    = [[procClass alloc] initWithURL: iObjectFile
-        controller: self options: &opts];
-
-    if (!theProcessor)
-    {
-        [self performSelectorOnMainThread: @selector(processingThreadDidFinish:)
-                               withObject: @"Unable to create processor."
-                            waitUntilDone: NO];
-        [pool release];
-        return;
-    }
-
-    if (![theProcessor processExe: iOutputFilePath])
-    {
-        NSString* resultString = (gCancel == YES) ? PROCESS_SUCCESS :
-            [NSString stringWithFormat: @"Unable to process %@.", [iObjectFile path]];
-
-        [self performSelectorOnMainThread: @selector(processingThreadDidFinish:)
-                               withObject: resultString
+                               withObject: PROCESS_SUCCESS
                             waitUntilDone: NO];
         [theProcessor release];
-        [pool release];
-        return;
     }
-
-    [self performSelectorOnMainThread: @selector(processingThreadDidFinish:)
-                           withObject: PROCESS_SUCCESS
-                        waitUntilDone: NO];
-    [theProcessor release];
-    [pool release];
 }
 
 //  processingThreadDidFinish:
@@ -575,12 +568,11 @@
 {
     [self syncSaveButton];
 
-    [iArchPopup setEnabled: NO];
-    [iThinButton setEnabled: NO];
-    [iVerifyButton setEnabled: NO];
-    [iOutputText setEnabled: NO];
-    [[iMainWindow standardWindowButton: NSWindowCloseButton]
-        setEnabled: NO];
+    iArchPopup.enabled = NO;
+    iThinButton.enabled = NO;
+    iVerifyButton.enabled = NO;
+    iOutputText.enabled = NO;
+    [iMainWindow standardWindowButton: NSWindowCloseButton].enabled = NO;
 
     [iMainWindow display];
 }
@@ -592,13 +584,12 @@
 {
     [self syncSaveButton];
 
-    [iArchPopup setEnabled: iExeIsFat];
-    [iThinButton setEnabled: iExeIsFat];
-    [iVerifyButton setEnabled: (iSelectedArchCPUType == CPU_TYPE_I386) ||
-                               (iSelectedArchCPUType == CPU_TYPE_X86_64)];
-    [iOutputText setEnabled: YES];
-    [[iMainWindow standardWindowButton: NSWindowCloseButton]
-        setEnabled: YES];
+    iArchPopup.enabled = iExeIsFat;
+    iThinButton.enabled = iExeIsFat;
+    iVerifyButton.enabled = (iSelectedArchCPUType == CPU_TYPE_I386) ||
+                            (iSelectedArchCPUType == CPU_TYPE_X86_64);
+    iOutputText.enabled = YES;
+    [iMainWindow standardWindowButton: NSWindowCloseButton].enabled = YES;
 
     [iMainWindow display];
 }
@@ -610,47 +601,38 @@
 - (void)showProgView
 {
     // Set up the target window frame.
-    NSRect  targetWindowFrame   = [iMainWindow frame];
-    NSRect  progViewFrame       = [iProgView frame];
+    NSRect  targetWindowFrame   = iMainWindow.frame;
+    NSRect  progViewFrame       = iProgView.frame;
 
     targetWindowFrame.origin.y      -= progViewFrame.size.height;
     targetWindowFrame.size.height   += progViewFrame.size.height;
 
     // Save the resize masks and apply new ones.
-    NSUInteger  origMainViewMask    = [iMainView autoresizingMask];
-    NSUInteger  origProgViewMask    = [iProgView autoresizingMask];
+    NSUInteger  origMainViewMask    = iMainView.autoresizingMask;
+    NSUInteger  origProgViewMask    = iProgView.autoresizingMask;
 
-    [iMainView setAutoresizingMask: NSViewMinYMargin];
-    [iProgView setAutoresizingMask: NSViewMinYMargin];
+    iMainView.autoresizingMask = NSViewMinYMargin;
+    iProgView.autoresizingMask = NSViewMinYMargin;
 
     // Set up an animation.
     NSMutableDictionary*    newWindowItem =
         [NSMutableDictionary dictionaryWithCapacity: 8];
 
     // Standard keys
-    [newWindowItem setObject: iMainWindow
-        forKey: NSViewAnimationTargetKey];
-    [newWindowItem setObject: [NSValue valueWithRect: targetWindowFrame]
-        forKey: NSViewAnimationEndFrameKey];
+    newWindowItem[NSViewAnimationTargetKey] = iMainWindow;
+    newWindowItem[NSViewAnimationEndFrameKey] = [NSValue valueWithRect: targetWindowFrame];
 
-    NSNumber*   effect          = [NSNumber numberWithUnsignedInt:
-        (NSXViewAnimationUpdateResizeMasksAtEndEffect       |
-        NSXViewAnimationUpdateWindowMinMaxSizesAtEndEffect  |
-        NSXViewAnimationPerformSelectorAtEndEffect)];
-    NSNumber*   origMainMask    = [NSNumber numberWithUnsignedLong:
-        origMainViewMask];
-    NSNumber*   origProgMask    = [NSNumber numberWithUnsignedLong:
-        origProgViewMask];
+    NSNumber*   effect          = @(
+        NSXViewAnimationUpdateResizeMasksAtEndEffect       |
+        NSXViewAnimationUpdateWindowMinMaxSizesAtEndEffect |
+        NSXViewAnimationPerformSelectorAtEndEffect);
+    NSNumber*   origMainMask    = @(origMainViewMask);
+    NSNumber*   origProgMask    = @(origProgViewMask);
 
     // Custom keys
-    [newWindowItem setObject: effect
-        forKey: NSXViewAnimationCustomEffectsKey];
-    [newWindowItem setObject: [NSArray arrayWithObjects:
-        origMainMask, origProgMask, nil]
-        forKey: NSXViewAnimationResizeMasksArrayKey];
-    [newWindowItem setObject: [NSArray arrayWithObjects:
-        iMainView, iProgView, nil]
-        forKey: NSXViewAnimationResizeViewsArrayKey];
+    newWindowItem[NSXViewAnimationCustomEffectsKey] = effect;
+    newWindowItem[NSXViewAnimationResizeMasksArrayKey] = @[origMainMask, origProgMask];
+    newWindowItem[NSXViewAnimationResizeViewsArrayKey] = @[iMainView, iProgView];
 
     // Since we're about to grow the window, first adjust the max height.
     NSSize  maxSize = [iMainWindow contentMaxSize];
@@ -659,29 +641,25 @@
     maxSize.height  += progViewFrame.size.height;
     minSize.height  += progViewFrame.size.height;
 
-    [iMainWindow setContentMaxSize: maxSize];
+    iMainWindow.contentMaxSize = maxSize;
 
     // Set the min size after the animation completes.
     NSValue*    minSizeValue    = [NSValue valueWithSize: minSize];
 
-    [newWindowItem setObject: minSizeValue
-        forKey: NSXViewAnimationWindowMinSizeKey];
+    newWindowItem[NSXViewAnimationWindowMinSizeKey] = minSizeValue;
 
     // Continue processing after the animation completes.
     SEL continueSel = @selector(continueProcessingFile);
 
-    [newWindowItem setObject:
-        [NSValue value: &continueSel withObjCType: @encode(SEL)]
-        forKey: NSXViewAnimationSelectorKey];
-    [newWindowItem setObject: [NSNumber numberWithBool: YES]
-        forKey: NSXViewAnimationPerformInNewThreadKey];
+    newWindowItem[NSXViewAnimationSelectorKey] = [NSValue value: &continueSel withObjCType: @encode(SEL)];
+    newWindowItem[NSXViewAnimationPerformInNewThreadKey] = @YES;
 
     SmoothViewAnimation*    theAnim = [[SmoothViewAnimation alloc]
-        initWithViewAnimations: [NSArray arrayWithObject: newWindowItem]];
+        initWithViewAnimations: @[newWindowItem]];
 
-    [theAnim setDelegate: self];
-    [theAnim setDuration: kMainAnimationTime];
-    [theAnim setAnimationCurve: NSAnimationLinear];
+    theAnim.delegate = self;
+    theAnim.duration = kMainAnimationTime;
+    theAnim.animationCurve = NSAnimationLinear;
 
     // Do the deed.
     [theAnim startAnimation];
@@ -694,40 +672,36 @@
 - (void)hideProgView: (BOOL)inAnimate
             openFile: (BOOL)inOpenFile
 {
-    NSRect  targetWindowFrame   = [iMainWindow frame];
-    NSRect  progViewFrame       = [iProgView frame];
+    NSRect  targetWindowFrame   = iMainWindow.frame;
+    NSRect  progViewFrame       = iProgView.frame;
 
     targetWindowFrame.origin.y      += progViewFrame.size.height;
     targetWindowFrame.size.height   -= progViewFrame.size.height;
 
-    NSUInteger  origMainViewMask    = [iMainView autoresizingMask];
-    NSUInteger  origProgViewMask    = [iProgView autoresizingMask];
+    NSUInteger  origMainViewMask    = iMainView.autoresizingMask;
+    NSUInteger  origProgViewMask    = iProgView.autoresizingMask;
 
-    NSNumber*   origMainMask    = [NSNumber numberWithUnsignedLong:
-        origMainViewMask];
-    NSNumber*   origProgMask    = [NSNumber numberWithUnsignedLong:
-        origProgViewMask];
+    NSNumber*   origMainMask    = @(origMainViewMask);
+    NSNumber*   origProgMask    = @(origProgViewMask);
 
-    [iMainView setAutoresizingMask: NSViewMinYMargin];
-    [iProgView setAutoresizingMask: NSViewMinYMargin];
+    iMainView.autoresizingMask = NSViewMinYMargin;
+    iProgView.autoresizingMask = NSViewMinYMargin;
 
-    NSSize  maxSize = [iMainWindow contentMaxSize];
-    NSSize  minSize = [iMainWindow contentMinSize];
+    NSSize  maxSize = iMainWindow.contentMaxSize;
+    NSSize  minSize = iMainWindow.contentMinSize;
 
     maxSize.height  -= progViewFrame.size.height;
     minSize.height  -= progViewFrame.size.height;
 
-    [iMainWindow setContentMinSize: minSize];
+    iMainWindow.contentMinSize = minSize;
 
     if (inAnimate)
     {
         NSMutableDictionary*    newWindowItem =
             [NSMutableDictionary dictionaryWithCapacity: 10];
 
-        [newWindowItem setObject: iMainWindow
-            forKey: NSViewAnimationTargetKey];
-        [newWindowItem setObject: [NSValue valueWithRect: targetWindowFrame]
-            forKey: NSViewAnimationEndFrameKey];
+        newWindowItem[NSViewAnimationTargetKey] = iMainWindow;
+        newWindowItem[NSViewAnimationEndFrameKey] = [NSValue valueWithRect: targetWindowFrame];
 
         uint32_t  effects =
             NSXViewAnimationUpdateResizeMasksAtEndEffect        |
@@ -737,41 +711,31 @@
         if (inOpenFile)
         {
             effects |= NSXViewAnimationOpenFileWithAppAtEndEffect;
-            [newWindowItem setObject: iOutputFilePath
-                forKey: NSXViewAnimationFilePathKey];
-            [newWindowItem setObject: [[NSUserDefaults standardUserDefaults]
-                objectForKey: OutputAppKey]
-                forKey: NSXViewAnimationAppNameKey];
+            newWindowItem[NSXViewAnimationFilePathKey] = iOutputFilePath;
+            newWindowItem[NSXViewAnimationAppNameKey] = [[NSUserDefaults standardUserDefaults]
+                                                         objectForKey: OutputAppKey];
         }
 
         // Custom keys
-        [newWindowItem setObject:[NSNumber numberWithUnsignedInt: effects]
-            forKey: NSXViewAnimationCustomEffectsKey];
-        [newWindowItem setObject: [NSArray arrayWithObjects:
-            origMainMask, origProgMask, nil]
-            forKey: NSXViewAnimationResizeMasksArrayKey];
-        [newWindowItem setObject: [NSArray arrayWithObjects:
-            iMainView, iProgView, nil]
-            forKey: NSXViewAnimationResizeViewsArrayKey];
+        newWindowItem[NSXViewAnimationCustomEffectsKey] = @(effects);
+        newWindowItem[NSXViewAnimationResizeMasksArrayKey] = @[origMainMask, origProgMask];
+        newWindowItem[NSXViewAnimationResizeViewsArrayKey] = @[iMainView, iProgView];
 
         SEL adjustSel   = @selector(adjustInterfaceForSingleThread);
 
-        [newWindowItem setObject:
-            [NSValue value: &adjustSel withObjCType: @encode(SEL)]
-            forKey: NSXViewAnimationSelectorKey];
+        newWindowItem[NSXViewAnimationSelectorKey] = [NSValue value: &adjustSel withObjCType: @encode(SEL)];
 
         NSValue*    maxSizeValue    =
             [NSValue valueWithSize: maxSize];
 
-        [newWindowItem setObject: maxSizeValue
-            forKey: NSXViewAnimationWindowMaxSizeKey];
+        newWindowItem[NSXViewAnimationWindowMaxSizeKey] = maxSizeValue;
 
         SmoothViewAnimation*    theAnim = [[SmoothViewAnimation alloc]
-            initWithViewAnimations: [NSArray arrayWithObject: newWindowItem]];
+            initWithViewAnimations: @[newWindowItem]];
 
-        [theAnim setDelegate: self];
-        [theAnim setDuration: kMainAnimationTime];
-        [theAnim setAnimationCurve: NSAnimationLinear];
+        theAnim.delegate = self;
+        theAnim.duration = kMainAnimationTime;
+        theAnim.animationCurve = NSAnimationLinear;
 
         // Do the deed.
         [theAnim startAnimation];
@@ -780,9 +744,9 @@
     else
     {
         [iMainWindow setFrame: targetWindowFrame display: NO];
-        [iMainWindow setContentMaxSize: maxSize];
-        [iMainView setAutoresizingMask: origMainViewMask];
-        [iProgView setAutoresizingMask: origProgViewMask];
+        iMainWindow.contentMaxSize = maxSize;
+        iMainView.autoresizingMask = origMainViewMask;
+        iProgView.autoresizingMask = origProgViewMask;
     }   
 }
 
@@ -821,13 +785,13 @@
         NSString*       theFileName =
             [iExeName stringByAppendingString: archExt];
 
-        [thePanel setNameFieldStringValue:theFileName];
-        [thePanel setTreatsFilePackagesAsDirectories: YES];
+        thePanel.nameFieldStringValue = theFileName;
+        thePanel.treatsFilePackagesAsDirectories = YES;
 
         if ([thePanel runModal]  != NSFileHandlingPanelOKButton)
             return;
 
-        theThinOutputPath   = [[thePanel URL] path];
+        theThinOutputPath   = thePanel.URL.path;
     }
     else
     {
@@ -895,11 +859,11 @@
 
                 [theAlert addButtonWithTitle: @"Fix"];
                 [theAlert addButtonWithTitle: @"Cancel"];
-                [theAlert setMessageText: @"Broken nop's found."];
-                [theAlert setInformativeText: [NSString stringWithFormat:
+                theAlert.messageText = @"Broken nop's found.";
+                theAlert.informativeText = [NSString stringWithFormat:
                     @"otx found %d broken nop's. Would you like to save "
                     @"a copy of the executable with fixed nop's?",
-                    foundCount]];
+                    foundCount];
                 [theAlert beginSheetModalForWindow: iMainWindow
                     modalDelegate: self didEndSelector:
                     @selector(nopAlertDidEnd:returnCode:contextInfo:)
@@ -908,8 +872,8 @@
             else
             {
                 [theAlert addButtonWithTitle: @"OK"];
-                [theAlert setMessageText: @"No broken nop's."];
-                [theAlert setInformativeText: @"The executable is healthy."];
+                theAlert.messageText = @"No broken nop's.";
+                theAlert.informativeText = @"The executable is healthy.";
                 [theAlert beginSheetModalForWindow: iMainWindow
                     modalDelegate: nil didEndSelector: nil contextInfo: nil];
             }
@@ -1000,9 +964,9 @@
         NSUserDefaults* theDefaults = [NSUserDefaults standardUserDefaults];
 
         if ([theDefaults boolForKey: AskOutputDirKey])
-            [menuItem setTitle: [NSString stringWithFormat: @"Save..."]];
+            menuItem.title = [NSString stringWithFormat: @"Save..."];
         else
-            [menuItem setTitle: @"Save"];
+            menuItem.title = @"Save";
 
         return iFileIsValid;
     }
@@ -1077,7 +1041,7 @@
     }
 
     iFileIsValid = YES;
-    [iPathText setStringValue: [iObjectFile path]];
+    iPathText.stringValue = iObjectFile.path;
     [self applyShadowToText: iPathText];
 
     mach_header mh = *(mach_header*)fileBytes;
@@ -1122,7 +1086,7 @@
             // Add the menu item with refcon.
             menuItem = [[NSMenuItem alloc] initWithTitle: archName
                 action: NULL keyEquivalent: @""];
-            [menuItem setTag: (NSInteger)&iCPUIDs[i]];
+            menuItem.tag = (NSInteger)&iCPUIDs[i];
             [archMenu addItem: menuItem];
         }
     }
@@ -1203,9 +1167,9 @@
     {
         case MH_MAGIC:
             if (iHostInfo.cpu_type == CPU_TYPE_POWERPC)
-                [iVerifyButton setEnabled: NO];
+                iVerifyButton.enabled = NO;
             else if (iHostInfo.cpu_type == CPU_TYPE_I386)
-                [iVerifyButton setEnabled: YES];
+                iVerifyButton.enabled = YES;
 
             menuItemTitleToSelect = tempString;
 
@@ -1213,9 +1177,9 @@
 
         case MH_CIGAM:
             if (iHostInfo.cpu_type == CPU_TYPE_POWERPC)
-                [iVerifyButton setEnabled: YES];
+                iVerifyButton.enabled = YES;
             else if (iHostInfo.cpu_type == CPU_TYPE_I386)
-                [iVerifyButton setEnabled: NO];
+                iVerifyButton.enabled = NO;
 
             menuItemTitleToSelect = tempString;
 
@@ -1223,9 +1187,9 @@
 
         case MH_MAGIC_64:
             if (iHostInfo.cpu_type == CPU_TYPE_POWERPC)
-                [iVerifyButton setEnabled: NO];
+                iVerifyButton.enabled = NO;
             else if (iHostInfo.cpu_type == CPU_TYPE_I386)
-                [iVerifyButton setEnabled: YES];
+                iVerifyButton.enabled = YES;
 
             menuItemTitleToSelect = tempString;
 
@@ -1233,9 +1197,9 @@
 
         case MH_CIGAM_64:
             if (iHostInfo.cpu_type == CPU_TYPE_POWERPC)
-                [iVerifyButton setEnabled: YES];
+                iVerifyButton.enabled = YES;
             else if (iHostInfo.cpu_type == CPU_TYPE_I386)
-                [iVerifyButton setEnabled: NO];
+                iVerifyButton.enabled = NO;
 
             menuItemTitleToSelect = tempString;
 
@@ -1273,7 +1237,7 @@
             if (faName != nil)
             {
                 iOutputFileLabel = [NSString stringWithFormat: @"_%@", faName];
-                [iVerifyButton setEnabled: (iHostInfo.cpu_type == CPU_TYPE_I386)];
+                iVerifyButton.enabled = (iHostInfo.cpu_type == CPU_TYPE_I386);
                 menuItemTitleToSelect = faName;
             }
 
@@ -1288,11 +1252,11 @@
             iFileIsValid = NO;
             iSelectedArchCPUType = 0;
             tempString = @"Not a Mach-O file";
-            [iVerifyButton setEnabled: NO];
+            iVerifyButton.enabled = NO;
             break;
     }
 
-    [iTypeText setStringValue: tempString];
+    iTypeText.stringValue = tempString;
     [self applyShadowToText: iTypeText];
 
     if (iOutputFileLabel)
@@ -1301,8 +1265,8 @@
     if (menuItemTitleToSelect != NULL)
         [iArchPopup selectItemWithTitle: menuItemTitleToSelect];
 
-    [iThinButton setEnabled: shouldEnableArch];
-    [iArchPopup setEnabled: shouldEnableArch];
+    iThinButton.enabled = shouldEnableArch;
+    iArchPopup.enabled = shouldEnableArch;
     [iArchPopup synchronizeTitleAndSelectedItem];
 }
 
@@ -1311,8 +1275,8 @@
 
 - (void)syncSaveButton
 {
-    [iSaveButton setEnabled: (iFileIsValid && !iProcessing &&
-        [[iOutputText stringValue] length] > 0)];
+    iSaveButton.enabled = iFileIsValid && !iProcessing &&
+        iOutputText.stringValue.length > 0;
 }
 
 //  syncOutputText:
@@ -1345,9 +1309,9 @@
     theString   = [theString stringByAppendingPathExtension: theExt];
 
     if (theString)
-        [iOutputText setStringValue: theString];
+        iOutputText.stringValue = theString;
     else
-        [iOutputText setStringValue: @"ERROR.FUKT"];
+        iOutputText.stringValue = @"ERROR.FUKT";
 }
 
 #pragma mark -
@@ -1360,14 +1324,14 @@
     NSToolbar*  toolbar = [[[NSToolbar alloc]
         initWithIdentifier: OTXPrefsToolbarID] autorelease];
 
-    [toolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
-    [toolbar setDelegate: self];
+    toolbar.displayMode = NSToolbarDisplayModeIconAndLabel;
+    toolbar.delegate = self;
 
-    [iPrefsWindow setToolbar: toolbar];
-    [iPrefsWindow setShowsToolbarButton: NO];
+    iPrefsWindow.toolbar = toolbar;
+    iPrefsWindow.showsToolbarButton = NO;
 
     // Load views.
-    NSUInteger  numViews    = [[toolbar items] count];
+    NSUInteger  numViews    = toolbar.items.count;
     NSUInteger  i;
 
     iPrefsViews     = calloc(numViews, sizeof(NSView*));
@@ -1375,14 +1339,14 @@
     iPrefsViews[1]  = iPrefsOutputView;
 
     // Set the General panel as selected.
-    [toolbar setSelectedItemIdentifier: PrefsGeneralToolbarItemID];
+    toolbar.selectedItemIdentifier = PrefsGeneralToolbarItemID;
 
     // Set window size.
     // Maybe it's just me, but when I have to tell an object something by
     // first asking the object something, I always think there's an instance
     // method missing.
     [iPrefsWindow setFrame: [iPrefsWindow frameRectForContentRect:
-        [iPrefsViews[iPrefsCurrentViewIndex] frame]] display: NO];
+        iPrefsViews[iPrefsCurrentViewIndex].frame] display: NO];
 
     for (i = 0; i < numViews; i++)
         [[iPrefsWindow contentView] addSubview: iPrefsViews[i]];
@@ -1394,7 +1358,7 @@
 - (IBAction)showPrefs: (id)sender
 {
     // Set window position only if the window is not already onscreen.
-    if (![iPrefsWindow isVisible])
+    if (!iPrefsWindow.visible)
         [iPrefsWindow center];
 
     [iPrefsWindow makeKeyAndOrderFront: nil];
@@ -1430,27 +1394,20 @@
     NSMutableDictionary*    newWindowDict =
         [NSMutableDictionary dictionaryWithCapacity: 5];
 
-    [newWindowDict setObject: iPrefsWindow
-        forKey: NSViewAnimationTargetKey];
-    [newWindowDict setObject: [NSValue valueWithRect: targetWindowFrame]
-        forKey: NSViewAnimationEndFrameKey];
+    newWindowDict[NSViewAnimationTargetKey] = iPrefsWindow;
+    newWindowDict[NSViewAnimationEndFrameKey] = [NSValue valueWithRect: targetWindowFrame];
 
-    [newWindowDict setObject: [NSNumber numberWithUnsignedInt:
-        NSXViewAnimationFadeOutAndSwapEffect]
-        forKey: NSXViewAnimationCustomEffectsKey];
-    [newWindowDict setObject: iPrefsViews[iPrefsCurrentViewIndex]
-        forKey: NSXViewAnimationSwapOldKey];
-    [newWindowDict setObject: iPrefsViews[newIndex]
-        forKey: NSXViewAnimationSwapNewKey];
+    newWindowDict[NSXViewAnimationCustomEffectsKey] = @(NSXViewAnimationFadeOutAndSwapEffect);
+    newWindowDict[NSXViewAnimationSwapOldKey] = iPrefsViews[iPrefsCurrentViewIndex];
+    newWindowDict[NSXViewAnimationSwapNewKey] = iPrefsViews[newIndex];
 
     // Create animation.
     SmoothViewAnimation*    windowAnim  = [[SmoothViewAnimation alloc]
-        initWithViewAnimations: [NSArray arrayWithObject:
-        newWindowDict]];
+        initWithViewAnimations: @[newWindowDict]];
 
-    [windowAnim setDelegate: self];
-    [windowAnim setDuration: kPrefsAnimationTime];
-    [windowAnim setAnimationCurve: NSAnimationLinear];
+    windowAnim.delegate = self;
+    windowAnim.duration = kPrefsAnimationTime;
+    windowAnim.animationCurve = NSAnimationLinear;
 
     iPrefsCurrentViewIndex  = newIndex;
 
@@ -1465,10 +1422,9 @@
 
 - (IBAction)cancel: (id)sender
 {
-    NSDictionary*   progDict    = [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSNumber numberWithBool: YES], PRIndeterminateKey,
-        @"Cancelling", PRDescriptionKey,
-        nil];
+    NSDictionary*   progDict    =
+        @{PRIndeterminateKey: @YES,
+          PRDescriptionKey:   @"Cancelling"};
 
     [self reportProgress: progDict];
 
@@ -1481,7 +1437,7 @@
 
 - (void)nudgeIndeterminateProgBar: (NSTimer*)timer
 {
-    if ([iProgBar isIndeterminate])
+    if (iProgBar.indeterminate)
         [iProgBar startAnimation: self];
 }
 
@@ -1496,8 +1452,8 @@
     NSAlert*    theAlert    = [[NSAlert alloc] init];
 
     [theAlert addButtonWithTitle: @"OK"];
-    [theAlert setMessageText: inMessageText];
-    [theAlert setInformativeText: inInformativeText];
+    theAlert.messageText = inMessageText;
+    theAlert.informativeText = inInformativeText;
     [theAlert beginSheetModalForWindow: iMainWindow
         modalDelegate: nil didEndSelector: nil contextInfo: nil];
     [theAlert release];
@@ -1516,21 +1472,21 @@
         return;
     }
 
-    NSString*   description     = [inDict objectForKey: PRDescriptionKey];
-    NSNumber*   indeterminate   = [inDict objectForKey: PRIndeterminateKey];
-    NSNumber*   value           = [inDict objectForKey: PRValueKey];
+    NSString*   description     = inDict[PRDescriptionKey];
+    NSNumber*   indeterminate   = inDict[PRIndeterminateKey];
+    NSNumber*   value           = inDict[PRValueKey];
 
     if (description)
     {
-        [iProgText setStringValue: description];
+        iProgText.stringValue = description;
         [self applyShadowToText: iProgText];
     }
 
     if (value)
-        [iProgBar setDoubleValue: [value doubleValue]];
+        iProgBar.doubleValue = value.doubleValue;
 
     if (indeterminate)
-        [iProgBar setIndeterminate: [indeterminate boolValue]];
+        iProgBar.indeterminate = indeterminate.boolValue;
 
     // This is a workaround for the bug mentioned by Mike Ash here:
     // http://mikeash.com/blog/pivot/entry.php?id=25 In our case, it causes
@@ -1571,7 +1527,7 @@
     // Bail if a folder.
     NSFileManager*  fileMan = [NSFileManager defaultManager];
     BOOL            isDirectory = NO;
-    NSString*       filePath = [files objectAtIndex: 0];
+    NSString*       filePath = files[0];
     NSString*       oFilePath = filePath;
 
     if ([fileMan fileExistsAtPath: filePath
@@ -1677,26 +1633,19 @@
     if (!animatedViews)
         return YES;
 
-    NSWindow*   animatingWindow = [[animatedViews objectAtIndex: 0]
-        objectForKey: NSViewAnimationTargetKey];
+    NSWindow*   animatingWindow = animatedViews[0][NSViewAnimationTargetKey];
 
     if (animatingWindow != iMainWindow  &&
         animatingWindow != iPrefsWindow)
         return YES;
 
-    NSUInteger i;
-    NSUInteger numAnimations = [animatedViews count];
-    id animObject = nil;
-
-    for (i = 0; i < numAnimations; i++)
+    for (id animObject in animatedViews)
     {
-        animObject  = [animatedViews objectAtIndex: i];
-
         if (!animObject)
             continue;
 
         NSNumber*   effectsNumber   =
-            [animObject objectForKey: NSXViewAnimationCustomEffectsKey];
+            animObject[NSXViewAnimationCustomEffectsKey];
 
         if (!effectsNumber)
             continue;
@@ -1705,44 +1654,40 @@
 
         if (effects & NSXViewAnimationSwapAtBeginningEffect)
         {   // Hide/show 2 views.
-            NSView* oldView = [animObject
-                objectForKey: NSXViewAnimationSwapOldKey];
-            NSView* newView = [animObject
-                objectForKey: NSXViewAnimationSwapNewKey];
+            NSView* oldView = animObject[NSXViewAnimationSwapOldKey];
+            NSView* newView = animObject[NSXViewAnimationSwapNewKey];
 
             if (oldView)
-                [oldView setHidden: YES];
+                oldView.hidden = YES;
 
             if (newView)
-                [newView setHidden: NO];
+                newView.hidden = NO;
         }
         else if (effects & NSXViewAnimationSwapAtBeginningAndEndEffect)
         {   // Hide a view.
-            NSView* oldView = [animObject objectForKey: NSXViewAnimationSwapOldKey];
+            NSView* oldView = animObject[NSXViewAnimationSwapOldKey];
 
             if (oldView)
-                [oldView setHidden: YES];
+                oldView.hidden = YES;
         }
         else if (effects & NSXViewAnimationFadeOutAndSwapEffect)
         {  // Fade out a view.
-            NSView* oldView = [animObject objectForKey: NSXViewAnimationSwapOldKey];
+            NSView* oldView = animObject[NSXViewAnimationSwapOldKey];
 
             if (oldView)
             {   // Create a new animation to fade out the view.
                 NSMutableDictionary* newAnimDict = [NSMutableDictionary dictionary];
 
-                [newAnimDict setObject: oldView
-                                forKey: NSViewAnimationTargetKey];
-                [newAnimDict setObject: NSViewAnimationFadeOutEffect
-                                forKey: NSViewAnimationEffectKey];
+                newAnimDict[NSViewAnimationTargetKey] = oldView;
+                newAnimDict[NSViewAnimationEffectKey] = NSViewAnimationFadeOutEffect;
 
                 SmoothViewAnimation *viewFadeOutAnim = [[SmoothViewAnimation alloc]
-                    initWithViewAnimations: [NSArray arrayWithObject: newAnimDict]];
+                    initWithViewAnimations: @[newAnimDict]];
 
-                [viewFadeOutAnim setDuration: [animation duration]];
-                [viewFadeOutAnim setAnimationCurve: [animation animationCurve]];
-                [viewFadeOutAnim setAnimationBlockingMode: [animation animationBlockingMode]];
-                [viewFadeOutAnim setFrameRate: [animation frameRate]];
+                viewFadeOutAnim.duration = animation.duration;
+                viewFadeOutAnim.animationCurve = animation.animationCurve;
+                viewFadeOutAnim.animationBlockingMode = animation.animationBlockingMode;
+                viewFadeOutAnim.frameRate = animation.frameRate;
 
                 // Do the deed.
                 [viewFadeOutAnim startAnimation];
@@ -1767,26 +1712,18 @@
     if (!animatedViews)
         return;
 
-    NSWindow*   animatingWindow = [[animatedViews objectAtIndex: 0]
-        objectForKey: NSViewAnimationTargetKey];
+    NSWindow*   animatingWindow = animatedViews[0][NSViewAnimationTargetKey];
 
     if (animatingWindow != iMainWindow  &&
         animatingWindow != iPrefsWindow)
         return;
 
-    NSUInteger  i;
-    NSUInteger  numAnimations   = [animatedViews count];
-    id      animObject      = nil;
-
-    for (i = 0; i < numAnimations; i++)
+    for (id animObject in animatedViews)
     {
-        animObject  = [animatedViews objectAtIndex: i];
-
         if (!animObject)
             continue;
 
-        NSNumber*   effectsNumber   =
-            [animObject objectForKey: NSXViewAnimationCustomEffectsKey];
+        NSNumber*   effectsNumber   = animObject[NSXViewAnimationCustomEffectsKey];
 
         if (!effectsNumber)
             continue;
@@ -1795,34 +1732,29 @@
 
         if (effects & NSXViewAnimationSwapAtEndEffect)
         {   // Hide/show 2 views.
-            NSView* oldView = [animObject
-                objectForKey: NSXViewAnimationSwapOldKey];
-            NSView* newView = [animObject
-                objectForKey: NSXViewAnimationSwapNewKey];
+            NSView* oldView = animObject[NSXViewAnimationSwapOldKey];
+            NSView* newView = animObject[NSXViewAnimationSwapNewKey];
 
             if (oldView)
-                [oldView setHidden: YES];
+                oldView.hidden = YES;
 
             if (newView)
-                [newView setHidden: NO];
+                newView.hidden = NO;
         }
         else if (effects & NSXViewAnimationSwapAtBeginningAndEndEffect ||
                  effects & NSXViewAnimationFadeOutAndSwapEffect)
         {   // Show a view.
-            NSView* newView = [animObject
-                objectForKey: NSXViewAnimationSwapNewKey];
+            NSView* newView = animObject[NSXViewAnimationSwapNewKey];
 
             if (newView)
-                [newView setHidden: NO];
+                newView.hidden = NO;
         }
 
         // Adjust multiple views' resize masks.
         if (effects & NSXViewAnimationUpdateResizeMasksAtEndEffect)
         {
-            NSArray*    masks   = [animObject
-                objectForKey: NSXViewAnimationResizeMasksArrayKey];
-            NSArray*    views   = [animObject
-                objectForKey: NSXViewAnimationResizeViewsArrayKey];
+            NSArray*    masks   = animObject[NSXViewAnimationResizeMasksArrayKey];
+            NSArray*    views   = animObject[NSXViewAnimationResizeViewsArrayKey];
 
             if (!masks || !views)
                 continue;
@@ -1838,31 +1770,29 @@
 
             for (i = 0; i < numMasks; i++)
             {
-                mask    = [masks objectAtIndex: i];
-                view    = [views objectAtIndex: i];
+                mask    = masks[i];
+                view    = views[i];
 
                 if (!mask || !view)
                     continue;
 
-                [view setAutoresizingMask: [mask unsignedIntValue]];
+                view.autoresizingMask = mask.unsignedIntValue;
             }
         }
 
         // Update the window's min and/or max sizes.
         if (effects & NSXViewAnimationUpdateWindowMinMaxSizesAtEndEffect)
         {
-            NSValue*    minSizeValue    = [animObject objectForKey:
+            NSValue*    minSizeValue    = animObject[
                 NSXViewAnimationWindowMinSizeKey];
-            NSValue*    maxSizeValue    = [animObject objectForKey:
+            NSValue*    maxSizeValue    = animObject[
                 NSXViewAnimationWindowMaxSizeKey];
 
             if (minSizeValue)
-                [animatingWindow setContentMinSize:
-                    [minSizeValue sizeValue]];
+                animatingWindow.contentMinSize = minSizeValue.sizeValue;
 
             if (maxSizeValue)
-                [animatingWindow setContentMaxSize:
-                    [maxSizeValue sizeValue]];
+                animatingWindow.contentMaxSize = maxSizeValue.sizeValue;
         }
 
         // Perform a selector. The method's return value is ignored, and the
@@ -1870,8 +1800,7 @@
         // NSInvocation instead.
         if (effects & NSXViewAnimationPerformSelectorAtEndEffect)
         {
-            NSValue*    selValue    = [animObject objectForKey:
-                NSXViewAnimationSelectorKey];
+            NSValue*    selValue    = animObject[NSXViewAnimationSelectorKey];
 
             if (selValue)
             {
@@ -1879,7 +1808,7 @@
 
                 [selValue getValue: &theSel];
 
-                NSNumber*   newThread   = [animObject objectForKey:
+                NSNumber*   newThread   = animObject[
                     NSXViewAnimationPerformInNewThreadKey];
 
                 if (newThread)
@@ -1893,10 +1822,8 @@
         // Open a file in another application.
         if (effects & NSXViewAnimationOpenFileWithAppAtEndEffect)
         {
-            NSString*   filePath    = [animObject objectForKey:
-                NSXViewAnimationFilePathKey];
-            NSString*   appName     = [animObject objectForKey:
-                NSXViewAnimationAppNameKey];
+            NSString*   filePath    = animObject[NSXViewAnimationFilePathKey];
+            NSString*   appName     = animObject[NSXViewAnimationAppNameKey];
 
             if (filePath && appName)
                 [[NSWorkspace sharedWorkspace] openFile: filePath
@@ -1930,10 +1857,10 @@
     // Setup our text shadow ivar.
     iTextShadow = [[NSShadow alloc] init];
 
-    [iTextShadow setShadowColor: [NSColor
-        colorWithCalibratedRed: 1.0f green: 1.0f blue: 1.0f alpha: 0.5f]];
-    [iTextShadow setShadowOffset: NSMakeSize(0.0f, -1.0f)];
-    [iTextShadow setShadowBlurRadius: 0.0f];
+    iTextShadow.shadowColor = [NSColor
+        colorWithCalibratedRed: 1.0f green: 1.0f blue: 1.0f alpha: 0.5f];
+    iTextShadow.shadowOffset = NSMakeSize(0.0f, -1.0f);
+    iTextShadow.shadowBlurRadius = 0.0f;
 
     // Setup the windows.
     [self setupPrefsWindow];
@@ -2004,19 +1931,19 @@ willBeInsertedIntoToolbar: (BOOL)willBeInserted
 
     if ([itemIdent isEqual: PrefsGeneralToolbarItemID])
     {
-        [item setLabel: @"General"];
-        [item setImage: [NSImage imageNamed: @"Prefs General Icon"]];
-        [item setTarget: self];
-        [item setAction: @selector(switchPrefsViews:)];
-        [item setTag: 0];
+        item.label = @"General";
+        item.image = [NSImage imageNamed: @"Prefs General Icon"];
+        item.target = self;
+        item.action = @selector(switchPrefsViews:);
+        item.tag = 0;
     }
     else if ([itemIdent isEqual: PrefsOutputToolbarItemID])
     {
-        [item setLabel: @"Output"];
-        [item setImage: [NSImage imageNamed: @"Prefs Output Icon"]];
-        [item setTarget: self];
-        [item setAction: @selector(switchPrefsViews:)];
-        [item setTag: 1];
+        item.label = @"Output";
+        item.image = [NSImage imageNamed: @"Prefs Output Icon"];
+        item.target = self;
+        item.action = @selector(switchPrefsViews:);
+        item.tag = 1;
     }
     else
         item = nil;

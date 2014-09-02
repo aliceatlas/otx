@@ -443,10 +443,9 @@
         return;
     }
 
-    NSDictionary*   progDict    = [[NSDictionary alloc] initWithObjectsAndKeys:
-        [NSNumber numberWithBool: YES], PRIndeterminateKey,
-        @"Loading executable", PRDescriptionKey,
-        nil];
+    NSDictionary*   progDict    =
+        [@{PRIndeterminateKey: @YES,
+           PRDescriptionKey: @"Loading executable"} mutableCopy];
 
     [self reportProgress: progDict];
     [progDict release];
@@ -572,10 +571,10 @@
         return;
     }
 
-    NSString*   description = [inDict objectForKey: PRDescriptionKey];
-    NSNumber*   newLine     = [inDict objectForKey: PRNewLineKey];
-    NSNumber*   value       = [inDict objectForKey: PRValueKey];
-    NSNumber*   complete    = [inDict objectForKey: PRCompleteKey];
+    NSString*   description = inDict[PRDescriptionKey];
+    NSNumber*   newLine     = inDict[PRNewLineKey];
+    NSNumber*   value       = inDict[PRValueKey];
+    NSNumber*   complete    = inDict[PRCompleteKey];
 
     if (newLine && [newLine boolValue])
         fprintf(stderr, "\n");

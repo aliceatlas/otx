@@ -84,16 +84,16 @@
     // Setup the C++ name demangler.
     if (iOpts.demangleCppNames)
     {
-        NSArray* args = [NSArray arrayWithObjects: @"-_", nil];
+        NSArray* args = @[@"-_"];
 
         iCPFiltTask = [[NSTask alloc] init];
         iCPFiltInputPipe = [[NSPipe alloc] init];
         iCPFiltOutputPipe = [[NSPipe alloc] init];
 
-        [iCPFiltTask setLaunchPath: @"/usr/bin/c++filt"];
-        [iCPFiltTask setArguments: args];
-        [iCPFiltTask setStandardInput: iCPFiltInputPipe];
-        [iCPFiltTask setStandardOutput: iCPFiltOutputPipe];
+        iCPFiltTask.launchPath = @"/usr/bin/c++filt";
+        iCPFiltTask.arguments = args;
+        iCPFiltTask.standardInput = iCPFiltInputPipe;
+        iCPFiltTask.standardOutput = iCPFiltOutputPipe;
         [iCPFiltTask launch];
     }
 
@@ -375,18 +375,17 @@
 
 - (NSString*)generateMD5String
 {
-    NSString* md5Path = [NSString pathWithComponents: [NSArray arrayWithObjects:
-        @"/", @"sbin", @"md5", nil]];
+    NSString* md5Path = [NSString pathWithComponents: @[@"/", @"sbin", @"md5"]];
     NSTask* md5Task = [[[NSTask alloc] init] autorelease];
     NSPipe* md5Pipe = [NSPipe pipe];
     NSPipe* errorPipe = [NSPipe pipe];
-    NSArray* args = [NSArray arrayWithObjects: @"-q", [iOFile path], nil];
+    NSArray* args = @[@"-q", [iOFile path]];
 
-    [md5Task setLaunchPath: md5Path];
-    [md5Task setArguments: args];
-    [md5Task setStandardInput: [NSPipe pipe]];
-    [md5Task setStandardOutput: md5Pipe];
-    [md5Task setStandardError: errorPipe];
+    md5Task.launchPath = md5Path;
+    md5Task.arguments = args;
+    md5Task.standardInput = [NSPipe pipe];
+    md5Task.standardOutput = md5Pipe;
+    md5Task.standardError = errorPipe;
 
     @try
     {
