@@ -8,6 +8,8 @@
 */
 
 #import <Cocoa/Cocoa.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
 
 #import "ExeProcessor.h"
 #import "ArchSpecifics.h"
@@ -45,35 +47,39 @@
     iOpts                   = *inOptions;
     iCurrentFuncInfoIndex   = -1;
 
-    // Load exe into RAM.
-    NSError*    theError    = nil;
-    NSData*     theData     = [NSData dataWithContentsOfURL: iOFile
-        options: 0 error: &theError];
-
-    if (!theData)
+    int fd = open(iOFile.path.UTF8String, O_RDONLY);
+    if (fd < 0)
     {
-        fprintf(stderr, "otx: error loading executable from disk: %s\n",
-            UTF8STRING(theError.localizedFailureReason));
+        char *errorStr = strerror(errno);
+        fprintf(stderr, "otx: unable to open executable: %s\n", errorStr);
         return nil;
     }
 
-    iRAMFileSize    = theData.length;
+    struct stat statBuf;
+    if (fstat(fd, &statBuf) < 0)
+    {
+        char *errorStr = strerror(errno);
+        fprintf(stderr, "otx: unable to stat executable: %s\n", errorStr);
+        close(fd);
+        return nil;
+    }
+    iRAMFileSize = statBuf.st_size;
 
     if (iRAMFileSize < sizeof(iFileArchMagic))
     {
         fprintf(stderr, "otx: truncated executable file\n");
+        close(fd);
         return nil;
     }
 
-    iRAMFile    = malloc(iRAMFileSize);
-
-    if (!iRAMFile)
+    iRAMFile = mmap(0, iRAMFileSize, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+    close(fd);
+    if (iRAMFile == (caddr_t) -1)
     {
-        fprintf(stderr, "otx: not enough memory to allocate mRAMFile\n");
+        char *errorStr = strerror(errno);
+        fprintf(stderr, "otx: error mapping memory: %s\n", errorStr);
         return nil;
     }
-
-    [theData getBytes: iRAMFile];
 
     iFileArchMagic  = *(uint32_t*)iRAMFile;
     iExeIsFat   = (iFileArchMagic == FAT_MAGIC || iFileArchMagic == FAT_CIGAM);
@@ -104,7 +110,7 @@
 {
     if (iRAMFile)
     {
-        free(iRAMFile);
+        munmap(iRAMFile, iRAMFileSize);
         iRAMFile = NULL;
     }
 
